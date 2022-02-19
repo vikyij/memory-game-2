@@ -1,6 +1,10 @@
 import React from 'react'
+import StartCard from '../../components/start-game'
+import Game from '../../components/selected-game'
+
+import './home.css'
 
 const Home = () => {
-  return <h1 className='bg-dark-blue text-white font-bold underline'>Home</h1>
+  return <Game />
 }
 export default Home

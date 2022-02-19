@@ -1,11 +1,8 @@
 import React from 'react'
+import Home from './pages/home'
 
 const GameApp = () => {
-  return (
-    <div>
-      <p>asdfghjklqwertyuiopnbvcxz</p>
-    </div>
-  )
+  return <Home />
 }
 
 export default GameApp
