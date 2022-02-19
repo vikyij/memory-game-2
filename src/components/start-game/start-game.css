@@ -1,0 +1,23 @@
+.card-container {
+  width: 327px;
+height: 386px;
+background: #FCFCFC;
+border-radius: 10px;
+display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0px;
+}
+
+.section-container {
+  margin: 10px auto;
+}
+
+.sub-heading {
+  font-weight: bold;
+font-size: 15px;
+line-height: 19px;
+color: #7191A5;
+margin: 9px auto;
+
+}
