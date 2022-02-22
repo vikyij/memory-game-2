@@ -3,8 +3,13 @@ interface ButtonProps {
   height: string
   bgcolor: string
   textcolor: string
-  children: string
+  children: string | number
   marginRight?: string
+  marginBottom?: string
+  borderRadius?: string
+  fontSize?: string
+  disabled?: boolean
+  handleClick?: () => void
 }
 
 export const ButtonComponent: React.FC<ButtonProps> = ({
@@ -14,6 +19,11 @@ export const ButtonComponent: React.FC<ButtonProps> = ({
   textcolor,
   children,
   marginRight,
+  marginBottom,
+  borderRadius,
+  fontSize,
+  disabled,
+  handleClick,
 }) => {
   const btnStyle = {
     width,
@@ -21,9 +31,15 @@ export const ButtonComponent: React.FC<ButtonProps> = ({
     backgroundColor: bgcolor,
     color: textcolor,
     border: '0',
-    borderRadius: '26px',
+    borderRadius: borderRadius || '26px',
     marginRight: marginRight || '0px',
+    marginBottom: marginBottom || '0px',
+    fontSize: fontSize || '16px',
   }
 
-  return <button style={btnStyle}>{children}</button>
+  return (
+    <button style={btnStyle} onClick={handleClick} disabled={disabled}>
+      {children}
+    </button>
+  )
 }

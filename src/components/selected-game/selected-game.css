@@ -3,3 +3,30 @@
   justify-content: space-between;
   padding: 20px;
 }
+
+.updates {
+  width: 151px;
+height: 70px;
+background: #DFE7EC;
+border-radius: 5px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+}
+
+.player {
+  font-weight: bold;
+font-size: 15px;
+line-height: 19px;
+text-align: center;
+color: #7191A5;
+}
+
+.score {
+  font-weight: bold;
+font-size: 24px;
+line-height: 30px;
+text-align: center;
+color: #304859;
+}

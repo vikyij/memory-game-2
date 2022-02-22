@@ -6,6 +6,7 @@ module.exports = {
       'dark-blue': '#152938',
       white: '#ffffff',
       'off-white': '#FCFCFC',
+      grey: '#7191A5',
     },
     screens: {
       sm: '500px',
