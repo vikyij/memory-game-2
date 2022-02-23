@@ -1,3 +1,4 @@
+import { time } from 'console'
 import React, { useState, useEffect } from 'react'
 import { ButtonComponent } from '../button'
 import Modal from '../modal'
@@ -12,13 +13,15 @@ const SelectedGame: React.FC<SelectedProps> = ({
   gridSize,
   numberOfplayers,
 }) => {
-  //let numberOfCircles = gridSize * gridSize
   const [showModal, setShowModal] = useState(false)
   const [grid, setGrid] = useState(gridSize)
   const [players, setPlayers] = useState(numberOfplayers)
   const [score, setScore] = useState(0)
   const [uniqueRandomNumbers, setUniqueRandomNumbers] = useState<number[]>([])
-  console.log(grid)
+  const [selectedValues, setSelectedValues] = useState<number[]>([])
+  const [count, setCount] = useState(0)
+  const [timer, setTimer] = useState(0)
+  const [pairs, setPairs] = useState<number[]>([])
 
   useEffect(() => {
     let randomArr = []
@@ -36,8 +39,54 @@ const SelectedGame: React.FC<SelectedProps> = ({
 
     allRandom = randomArr.concat(randomArr2)
     setUniqueRandomNumbers(allRandom)
-    console.log(allRandom)
   }, [gridSize])
+
+  useEffect(() => {
+    let timer = setTimeout(() => {
+      let elem = document.getElementsByClassName(
+        'circleValue'
+      ) as HTMLCollectionOf<HTMLElement>
+
+      for (let i = 0; i < elem.length; i++) {
+        elem[i].style.display = 'none'
+      }
+    }, 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [])
+
+  const updateTimer = () => {
+    const getSeconds = `0${timer % 60}`.slice(-2)
+    const minutes = `${Math.floor(timer / 60)}`
+    // added + because of a typescript error 'The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type'
+    const getMinutes = `0${+minutes % 60}`.slice(-2)
+    const getHours = `0${Math.floor(timer / 3600)}`.slice(-2)
+
+    return `${getHours} : ${getMinutes} : ${getSeconds}`
+  }
+
+  const handleClick = (value: number, index: number) => {
+    if (selectedValues.indexOf(value) !== -1) {
+      setPairs((prev) => [...prev, value])
+    }
+
+    setSelectedValues((prev) => [...prev, value])
+
+    setCount((count) => count + 1)
+
+    let elem = document.getElementsByClassName(
+      'circleValue'
+    ) as HTMLCollectionOf<HTMLElement>
+
+    elem[index].style.display = 'block'
+    console.log(pairs)
+  }
+
+  useEffect(() => {
+    const timeInterval = setInterval(() => setTimer((timer) => timer + 1), 1000)
+    return () => clearInterval(timeInterval)
+  }, [])
 
   return (
     <>
@@ -56,18 +105,18 @@ const SelectedGame: React.FC<SelectedProps> = ({
       <div className='flex justify-between flex-wrap w-80 m-auto'>
         {uniqueRandomNumbers.map((value, index) => {
           return (
-            <ButtonComponent
-              width={gridSize === 6 ? '46px' : '65px'}
-              height={gridSize === 6 ? '46px' : '65px'}
-              bgcolor='#FDA214'
-              textcolor='#fff'
-              borderRadius='50%'
-              marginBottom='10px'
-              fontSize={gridSize === 6 ? '24px' : '40px'}
-              handleClick={() => console.log(value)}
+            <div
+              key={index}
+              onClick={() => handleClick(value, index)}
+              className='circleStyle'
+              style={{
+                width: gridSize === 6 ? '46px' : '65px',
+                height: gridSize === 6 ? '46px' : '65px',
+                fontSize: gridSize === 6 ? '24px' : '40px',
+              }}
             >
-              {value}
-            </ButtonComponent>
+              <p className='circleValue'>{value}</p>
+            </div>
           )
         })}
       </div>
@@ -80,11 +129,11 @@ const SelectedGame: React.FC<SelectedProps> = ({
           <>
             <div className='updates mr-3'>
               <p className='text-grey font-semibold'>Time</p>
-              <p>1:53</p>
+              <p>{updateTimer()}</p>
             </div>
             <div className='updates'>
               <p className='text-grey font-semibold'>Moves</p>
-              <p>39</p>
+              <p>{count}</p>
             </div>
           </>
         ) : (
@@ -123,6 +172,50 @@ const SelectedGame: React.FC<SelectedProps> = ({
               handleClick={() => setShowModal(true)}
             >
               New Game
+            </ButtonComponent>
+          </>
+        </Modal>
+      )}
+
+      {pairs.length === 8 && (
+        <Modal
+          handleClose={() => setShowModal(false)}
+          width='327px'
+          height='376px'
+        >
+          <>
+            <h1 className='modal2-heading'>You did it!</h1>
+            <p className='modal2-subheading'>
+              Game over! Here’s how you got on…
+            </p>
+            <div style={{ margin: '25px auto' }}>
+              <div className='modal-timer-div' style={{ marginBottom: '10px' }}>
+                <p className='modal-timer-text'>Time ELapsed</p>
+                <p className='modal-timer-text2'>{updateTimer()}</p>
+              </div>
+              <div className='modal-timer-div'>
+                <p className='modal-timer-text'>Moves Taken</p>
+                <p className='modal-timer-text2'>{`${count} Moves`}</p>
+              </div>
+            </div>
+            <ButtonComponent
+              width='279px'
+              height='48px'
+              bgcolor='#FDA214'
+              textcolor='#fff'
+              marginBottom='15px'
+              handleClick={() => setShowModal(true)}
+            >
+              Restart
+            </ButtonComponent>
+            <ButtonComponent
+              width='279px'
+              height='48px'
+              bgcolor='#DFE7EC'
+              textcolor='#304859'
+              handleClick={() => setShowModal(true)}
+            >
+              Setup New Game
             </ButtonComponent>
           </>
         </Modal>

@@ -30,3 +30,56 @@ line-height: 30px;
 text-align: center;
 color: #304859;
 }
+
+.circleStyle {
+  background-color:#FDA214;
+             color:#fff;
+             border-radius:50%;
+              margin-bottom:10px;
+              cursor: pointer;
+              padding: 4px;
+    text-align: center;
+}
+
+.modal2-heading {
+  font-weight: bold;
+font-size: 24px;
+line-height: 30px;
+text-align: center;
+color: #152938;
+}
+
+.modal2-subheading {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  color: #7191A5;
+}
+
+.modal-timer-div {
+  width: 279px;
+height: 48px;
+background: #DFE7EC;
+border-radius: 5px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 15px;
+
+}
+
+.modal-timer-text {
+  font-weight: bold;
+font-size: 13px;
+line-height: 16px;
+color: #7191A5;
+}
+
+.modal-timer-text2 {
+  font-weight: bold;
+font-size: 20px;
+line-height: 25px;
+text-align: right;
+color: #304859;
+}
