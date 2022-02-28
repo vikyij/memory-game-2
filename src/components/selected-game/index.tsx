@@ -1,12 +1,30 @@
-import { time } from 'console'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, MouseEvent } from 'react'
 import { ButtonComponent } from '../button'
 import Modal from '../modal'
 import './selected-game.css'
+import classnames from 'classnames'
 
 interface SelectedProps {
   gridSize: number
   numberOfplayers: number
+}
+
+type Grid = {
+  [key: string]: {
+    value: string
+    selected: boolean
+    disabled: boolean
+  }
+}
+
+/* Randomize array in-place using Durstenfeld shuffle algorithm */
+function shuffleArray(array: number[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const temp = array[i]
+    array[i] = array[j]
+    array[j] = temp
+  }
 }
 
 const SelectedGame: React.FC<SelectedProps> = ({
@@ -14,47 +32,53 @@ const SelectedGame: React.FC<SelectedProps> = ({
   numberOfplayers,
 }) => {
   const [showModal, setShowModal] = useState(false)
-  const [grid, setGrid] = useState(gridSize)
+  const [grid, setGrid] = useState<Grid>({})
   const [players, setPlayers] = useState(numberOfplayers)
+  const [selection, setSelection] = useState<string[]>([])
   const [score, setScore] = useState(0)
-  const [uniqueRandomNumbers, setUniqueRandomNumbers] = useState<number[]>([])
-  const [selectedValues, setSelectedValues] = useState<number[]>([])
   const [count, setCount] = useState(0)
   const [timer, setTimer] = useState(0)
-  const [pairs, setPairs] = useState<number[]>([])
+  const [completed, setCompleted] = useState<boolean>()
+  const [randomArraySize, setRandomArraySize] = useState(0)
 
   useEffect(() => {
-    let randomArr = []
-    let randomArr2 = []
-    let allRandom = []
-    let numberOfCircles = gridSize === 4 ? 8 : 18
+    const randomArr: number[] = []
+    const numberOfCircles = gridSize === 4 ? 16 : 36
+    const grid: Grid = {}
 
     while (randomArr.length < numberOfCircles) {
       let random = Math.floor(Math.random() * (numberOfCircles - 1 + 1) + 1)
       if (randomArr.indexOf(random) === -1) {
-        randomArr.push(random)
-        randomArr2.push(random)
+        randomArr.push(...[random, random])
+      }
+    }
+    shuffleArray(randomArr)
+    setRandomArraySize(randomArr.length)
+    for (let i = 0; i < randomArr.length; i++) {
+      grid[`grid-${i}`] = {
+        value: randomArr[i].toString(),
+        selected: true,
+        disabled: false,
       }
     }
 
-    allRandom = randomArr.concat(randomArr2)
-    setUniqueRandomNumbers(allRandom)
+    setGrid(grid)
   }, [gridSize])
 
   useEffect(() => {
-    let timer = setTimeout(() => {
-      let elem = document.getElementsByClassName(
-        'circleValue'
-      ) as HTMLCollectionOf<HTMLElement>
-
-      for (let i = 0; i < elem.length; i++) {
-        elem[i].style.display = 'none'
-      }
-    }, 2000)
-    return () => {
-      clearTimeout(timer)
+    for (let i = 0; i < randomArraySize; i++) {
+      setTimeout(
+        () =>
+          setGrid((grid) => {
+            return {
+              ...grid,
+              [`grid-${i}`]: { ...grid[`grid-${i}`], selected: false },
+            }
+          }),
+        1000
+      )
     }
-  }, [])
+  }, [randomArraySize])
 
   const updateTimer = () => {
     const getSeconds = `0${timer % 60}`.slice(-2)
@@ -62,31 +86,75 @@ const SelectedGame: React.FC<SelectedProps> = ({
     // added + because of a typescript error 'The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type'
     const getMinutes = `0${+minutes % 60}`.slice(-2)
     const getHours = `0${Math.floor(timer / 3600)}`.slice(-2)
-
     return `${getHours} : ${getMinutes} : ${getSeconds}`
   }
 
-  const handleClick = (value: number, index: number) => {
-    if (selectedValues.indexOf(value) !== -1) {
-      setPairs((prev) => [...prev, value])
-    }
-
-    setSelectedValues((prev) => [...prev, value])
+  const handleClick = (ev: MouseEvent<HTMLDivElement>) => {
+    ev.stopPropagation()
+    let id = (ev.target as HTMLDivElement).getAttribute('data-id')
 
     setCount((count) => count + 1)
+    if (id) {
+      if (selection.length === 0) {
+        setGrid((grid) => {
+          const target = grid[id as string]
+          return {
+            ...grid,
+            [id as string]: { ...target, selected: !target.selected },
+          }
+        })
+        setSelection([id])
+      } else {
+        const target_1 = grid[selection[0]]
+        const target_2 = grid[id]
 
-    let elem = document.getElementsByClassName(
-      'circleValue'
-    ) as HTMLCollectionOf<HTMLElement>
-
-    elem[index].style.display = 'block'
-    console.log(pairs)
+        if (target_1.value !== target_2.value) {
+          // Set timeout and hide boxes
+          setGrid((grid) => {
+            return {
+              ...grid,
+              [id as string]: { ...target_2, selected: true },
+            }
+          })
+          setTimeout(
+            () =>
+              setGrid((grid) => {
+                return {
+                  ...grid,
+                  [selection[0]]: { ...target_1, selected: false },
+                  [id as string]: { ...target_2, selected: false },
+                }
+              }),
+            500
+          )
+        } else {
+          setGrid((grid) => {
+            return {
+              ...grid,
+              [selection[0]]: { ...target_1, disabled: true, selected: true },
+              [id as string]: { ...target_2, disabled: true, selected: true },
+            }
+          })
+        }
+        setSelection([])
+      }
+    }
   }
 
   useEffect(() => {
-    const timeInterval = setInterval(() => setTimer((timer) => timer + 1), 1000)
-    return () => clearInterval(timeInterval)
-  }, [])
+    const finished = Object.entries(grid).every(
+      ([id, { value, selected, disabled }]) => disabled === true
+    )
+    setCompleted(finished)
+    const timeInterval = setInterval(() => {
+      if (!finished) {
+        setTimer((timer) => timer + 1)
+      }
+    }, 1000)
+    return () => {
+      clearInterval(timeInterval)
+    }
+  }, [grid])
 
   return (
     <>
@@ -102,20 +170,31 @@ const SelectedGame: React.FC<SelectedProps> = ({
           Menu
         </ButtonComponent>
       </div>
-      <div className='flex justify-between flex-wrap w-80 m-auto'>
-        {uniqueRandomNumbers.map((value, index) => {
+      <div
+        className='flex justify-between flex-wrap w-80 m-auto'
+        onClick={handleClick}
+      >
+        {/* convert an object to array */}
+        {Object.entries(grid).map(([id, { value, selected, disabled }]) => {
           return (
             <div
-              key={index}
-              onClick={() => handleClick(value, index)}
-              className='circleStyle'
+              key={id}
+              data-id={id}
+              className={classnames('circleStyle', {
+                'opacity-50 pointer-events-none': disabled,
+              })}
               style={{
                 width: gridSize === 6 ? '46px' : '65px',
                 height: gridSize === 6 ? '46px' : '65px',
                 fontSize: gridSize === 6 ? '24px' : '40px',
               }}
             >
-              <p className='circleValue'>{value}</p>
+              <p
+                data-id={id}
+                className={classnames('circleValue', { hidden: !selected })}
+              >
+                {value}
+              </p>
             </div>
           )
         })}
@@ -177,7 +256,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
         </Modal>
       )}
 
-      {pairs.length === 8 && (
+      {completed && (
         <Modal
           handleClose={() => setShowModal(false)}
           width='327px'
