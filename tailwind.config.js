@@ -7,6 +7,10 @@ module.exports = {
       white: '#ffffff',
       'off-white': '#FCFCFC',
       grey: '#7191A5',
+      'light-grey': '#BCCED9',
+      orange: '#FDA214',
+      'navy-blue': '#304859',
+      ash: '#DFE7EC',
     },
     screens: {
       sm: '500px',

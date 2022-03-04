@@ -1,4 +1,4 @@
-import React, { useState, useEffect, MouseEvent } from 'react'
+import React, { useState, useEffect, MouseEvent, useCallback } from 'react'
 import { ButtonComponent } from '../button'
 import Modal from '../modal'
 import './selected-game.css'
@@ -7,6 +7,7 @@ import classnames from 'classnames'
 interface SelectedProps {
   gridSize: number
   numberOfplayers: number
+  handleEndGame: () => void
 }
 
 type Grid = {
@@ -15,6 +16,15 @@ type Grid = {
     selected: boolean
     disabled: boolean
   }
+}
+
+interface PlayerScore {
+  player: number
+}
+
+interface Winner {
+  player: number
+  score: number
 }
 
 /* Randomize array in-place using Durstenfeld shuffle algorithm */
@@ -30,18 +40,49 @@ function shuffleArray(array: number[]) {
 const SelectedGame: React.FC<SelectedProps> = ({
   gridSize,
   numberOfplayers,
+  handleEndGame,
 }) => {
   const [showModal, setShowModal] = useState(false)
   const [grid, setGrid] = useState<Grid>({})
-  const [players, setPlayers] = useState(numberOfplayers)
+  const [players] = useState(numberOfplayers)
   const [selection, setSelection] = useState<string[]>([])
-  const [score, setScore] = useState(0)
+  const [winnerScore, setWinnerScore] = useState<Winner[]>([])
   const [count, setCount] = useState(0)
   const [timer, setTimer] = useState(0)
-  const [completed, setCompleted] = useState<boolean>()
+  const [singleCompleted, setSingleCompleted] = useState<boolean>()
+  const [multiplayerCompletedGame, setMultiplayerCompletedGame] =
+    useState<boolean>()
   const [randomArraySize, setRandomArraySize] = useState(0)
+  const [currentPlayer, setCurrentPlayer] = useState(1)
+  const [playerScore, setPlayerScore] = useState<PlayerScore[]>([])
+  const [player1Score, setPlayer1Score] = useState({ player: 1, score: 0 })
+  const [player2Score, setPlayer2Score] = useState({ player: 2, score: 0 })
+  const [player3Score, setPlayer3Score] = useState({ player: 3, score: 0 })
+  const [player4Score, setPlayer4Score] = useState({ player: 4, score: 0 })
 
-  useEffect(() => {
+  const setNewGame = () => {
+    handleRestart()
+    handleEndGame()
+  }
+
+  const handleRestart = () => {
+    setGridValues()
+    gridTimeout()
+    setCount(0)
+    setTimer(0)
+    setCurrentPlayer(1)
+    setPlayerScore([])
+    setSingleCompleted(false)
+    setMultiplayerCompletedGame(false)
+    setShowModal(false)
+    setPlayer1Score({ player: 1, score: 0 })
+    setPlayer2Score({ player: 2, score: 0 })
+    setPlayer3Score({ player: 3, score: 0 })
+    setPlayer4Score({ player: 4, score: 0 })
+    setWinnerScore([])
+  }
+
+  const setGridValues = useCallback(() => {
     const randomArr: number[] = []
     const numberOfCircles = gridSize === 4 ? 16 : 36
     const grid: Grid = {}
@@ -65,7 +106,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
     setGrid(grid)
   }, [gridSize])
 
-  useEffect(() => {
+  const gridTimeout = useCallback(() => {
     for (let i = 0; i < randomArraySize; i++) {
       setTimeout(
         () =>
@@ -79,6 +120,14 @@ const SelectedGame: React.FC<SelectedProps> = ({
       )
     }
   }, [randomArraySize])
+
+  useEffect(() => {
+    setGridValues()
+  }, [setGridValues])
+
+  useEffect(() => {
+    gridTimeout()
+  }, [gridTimeout])
 
   const updateTimer = () => {
     const getSeconds = `0${timer % 60}`.slice(-2)
@@ -116,6 +165,12 @@ const SelectedGame: React.FC<SelectedProps> = ({
               [id as string]: { ...target_2, selected: true },
             }
           })
+          if (currentPlayer === numberOfplayers) {
+            setCurrentPlayer(1)
+          } else {
+            setCurrentPlayer((prev) => prev + 1)
+          }
+
           setTimeout(
             () =>
               setGrid((grid) => {
@@ -135,6 +190,13 @@ const SelectedGame: React.FC<SelectedProps> = ({
               [id as string]: { ...target_2, disabled: true, selected: true },
             }
           })
+          if (currentPlayer === numberOfplayers) {
+            setCurrentPlayer(1)
+          } else {
+            setCurrentPlayer((prev) => prev + 1)
+          }
+
+          setPlayerScore((prev) => [...prev, { player: currentPlayer }])
         }
         setSelection([])
       }
@@ -142,19 +204,76 @@ const SelectedGame: React.FC<SelectedProps> = ({
   }
 
   useEffect(() => {
+    playerScore.map((player) => {
+      if (player.player === 1) {
+        setPlayer1Score({ player: 1, score: player1Score.score + 1 })
+      } else {
+        setPlayer1Score({ player: 1, score: player1Score.score })
+      }
+
+      if (player.player === 2) {
+        setPlayer2Score({ player: 2, score: player2Score.score + 1 })
+      } else {
+        setPlayer2Score({ player: 2, score: player2Score.score })
+      }
+
+      if (player.player === 3) {
+        setPlayer3Score({ player: 3, score: player3Score.score + 1 })
+      } else {
+        setPlayer3Score({ player: 3, score: player3Score.score })
+      }
+
+      if (player.player === 4) {
+        setPlayer4Score({ player: 4, score: player4Score.score + 1 })
+      } else {
+        setPlayer4Score({ player: 4, score: player4Score.score })
+      }
+    })
+    // console.log(player.player === 1)
+  }, [playerScore])
+
+  useEffect(() => {
     const finished = Object.entries(grid).every(
       ([id, { value, selected, disabled }]) => disabled === true
     )
-    setCompleted(finished)
-    const timeInterval = setInterval(() => {
-      if (!finished) {
-        setTimer((timer) => timer + 1)
+
+    if (numberOfplayers === 1) {
+      setSingleCompleted(finished)
+      const timeInterval = setInterval(() => {
+        if (!finished) {
+          setTimer((timer) => timer + 1)
+        }
+      }, 1000)
+      return () => {
+        clearInterval(timeInterval)
       }
-    }, 1000)
-    return () => {
-      clearInterval(timeInterval)
+    } else {
+      setMultiplayerCompletedGame(finished)
     }
-  }, [grid])
+  }, [grid, numberOfplayers])
+
+  const showWinner = useCallback(() => {
+    let winner: Winner[] = []
+
+    switch (numberOfplayers) {
+      case 2:
+        winner.push(player1Score, player2Score)
+        winner.sort((a, b) => b.score - a.score)
+        break
+      case 3:
+        winner.push(player1Score, player2Score, player3Score)
+        winner.sort((a, b) => b.score - a.score)
+        break
+      case 4:
+        winner.push(player1Score, player2Score, player3Score, player4Score)
+        winner.sort((a, b) => b.score - a.score)
+        break
+    }
+
+    setWinnerScore(winner)
+  }, [numberOfplayers, player1Score, player2Score, player3Score, player4Score])
+
+  useEffect(() => showWinner(), [showWinner, multiplayerCompletedGame])
 
   return (
     <>
@@ -181,7 +300,10 @@ const SelectedGame: React.FC<SelectedProps> = ({
               key={id}
               data-id={id}
               className={classnames('circleStyle', {
-                'opacity-50 pointer-events-none': disabled,
+                'pointer-events-none': disabled,
+                'bg-navy-blue': !selected,
+                'bg-light-grey': selected && disabled,
+                'bg-orange': selected && !disabled,
               })}
               style={{
                 width: gridSize === 6 ? '46px' : '65px',
@@ -219,17 +341,31 @@ const SelectedGame: React.FC<SelectedProps> = ({
           [...Array(players)].map((player, index) => {
             return (
               <div
-                className='w-16 h-20 rounded-md flex flex-col justify-center mr-3'
-                style={{ backgroundColor: '#DFE7EC' }}
+                className={classnames(
+                  'w-16 h-20 rounded-md flex flex-col justify-center mr-3 ',
+                  {
+                    'bg-ash': currentPlayer !== index + 1,
+                    'bg-orange': currentPlayer === index + 1,
+                  }
+                )}
               >
                 <p className='player'>{`P ${index + 1}`}</p>
-                <h3 className='score'>{score}</h3>
+                <h3 className='score'>
+                  {index + 1 === 1
+                    ? player1Score.score
+                    : index + 1 === 2
+                    ? player2Score.score
+                    : index + 1 === 3
+                    ? player3Score.score
+                    : index + 1 === 4 && player4Score.score}
+                </h3>
               </div>
             )
           })
         )}
       </div>
 
+      {/* show modal on click of menu button */}
       {showModal && (
         <Modal handleClose={() => setShowModal(false)}>
           <>
@@ -239,7 +375,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
               bgcolor='#FDA214'
               textcolor='#fff'
               marginBottom='20px'
-              handleClick={() => setShowModal(true)}
+              handleClick={handleRestart}
             >
               Restart
             </ButtonComponent>
@@ -248,7 +384,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
               height='48px'
               bgcolor='#DFE7EC'
               textcolor='#fff'
-              handleClick={() => setShowModal(true)}
+              handleClick={setNewGame}
             >
               New Game
             </ButtonComponent>
@@ -256,7 +392,8 @@ const SelectedGame: React.FC<SelectedProps> = ({
         </Modal>
       )}
 
-      {completed && (
+      {/* show modal when game is completed for a single player */}
+      {singleCompleted && (
         <Modal
           handleClose={() => setShowModal(false)}
           width='327px'
@@ -269,7 +406,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
             </p>
             <div style={{ margin: '25px auto' }}>
               <div className='modal-timer-div' style={{ marginBottom: '10px' }}>
-                <p className='modal-timer-text'>Time ELapsed</p>
+                <p className='modal-timer-text'>Time Elapsed</p>
                 <p className='modal-timer-text2'>{updateTimer()}</p>
               </div>
               <div className='modal-timer-div'>
@@ -283,7 +420,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
               bgcolor='#FDA214'
               textcolor='#fff'
               marginBottom='15px'
-              handleClick={() => setShowModal(true)}
+              handleClick={handleRestart}
             >
               Restart
             </ButtonComponent>
@@ -292,7 +429,81 @@ const SelectedGame: React.FC<SelectedProps> = ({
               height='48px'
               bgcolor='#DFE7EC'
               textcolor='#304859'
-              handleClick={() => setShowModal(true)}
+              handleClick={setNewGame}
+            >
+              Setup New Game
+            </ButtonComponent>
+          </>
+        </Modal>
+      )}
+
+      {/* show modal when game is completed for multiplayer */}
+      {multiplayerCompletedGame && (
+        <Modal
+          handleClose={() => setShowModal(false)}
+          width='327px'
+          height='488px'
+        >
+          <>
+            <h1 className='modal2-heading'>
+              {winnerScore[0].score === winnerScore[1].score
+                ? 'It’s a tie!'
+                : `Player ${winnerScore[0].player} Wins!`}
+            </h1>
+            <p className='modal2-subheading'>
+              Game over! Here are the results…
+            </p>
+            <div style={{ margin: '25px auto' }}>
+              {winnerScore.map((player, index) => {
+                return (
+                  <div
+                    className={classnames(
+                      'modal-timer-div',
+                      'bg-ash',
+                      'text-grey',
+                      {
+                        'text-white':
+                          index === 0 || player.score === winnerScore[0].score,
+                        'bg-dark-blue':
+                          index === 0 || player.score === winnerScore[0].score,
+                      }
+                    )}
+                    style={{ marginBottom: '10px' }}
+                  >
+                    <p className='modal-timer-text'>Player {player.player}</p>
+                    <p
+                      className={classnames(
+                        'modal-timer-text2',
+                        'text-dark-blue',
+                        {
+                          'text-white':
+                            index === 0 ||
+                            player.score === winnerScore[0].score,
+                        }
+                      )}
+                    >
+                      {player.score}Pairs
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+            <ButtonComponent
+              width='279px'
+              height='48px'
+              bgcolor='#FDA214'
+              textcolor='#fff'
+              marginBottom='15px'
+              handleClick={handleRestart}
+            >
+              Restart
+            </ButtonComponent>
+            <ButtonComponent
+              width='279px'
+              height='48px'
+              bgcolor='#DFE7EC'
+              textcolor='#304859'
+              handleClick={setNewGame}
             >
               Setup New Game
             </ButtonComponent>
