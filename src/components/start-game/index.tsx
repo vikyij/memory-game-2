@@ -9,10 +9,20 @@ const StartCard = () => {
   const [numberOfplayers, setNumberOfPlayers] = useState(0)
   const [startGame, setStartGame] = useState(false)
 
+  const handleEndGame = () => {
+    setGridSize(0)
+    setNumberOfPlayers(0)
+    setStartGame(false)
+  }
+
   return (
     <>
       {startGame ? (
-        <Game gridSize={gridSize} numberOfplayers={numberOfplayers} />
+        <Game
+          gridSize={gridSize}
+          numberOfplayers={numberOfplayers}
+          handleEndGame={handleEndGame}
+        />
       ) : (
         <div className='bg-dark-blue w-screen h-screen flex flex-col justify-center items-center'>
           <h1 className='font-bold text-off-white text-2xl mb-10'>memory</h1>
