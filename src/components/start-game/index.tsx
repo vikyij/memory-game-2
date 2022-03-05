@@ -6,7 +6,7 @@ import './start-game.css'
 
 const StartCard = () => {
   const [gridSize, setGridSize] = useState(0)
-  const [numberOfplayers, setNumberOfPlayers] = useState(0)
+  const [numberOfPlayers, setNumberOfPlayers] = useState(0)
   const [startGame, setStartGame] = useState(false)
 
   const handleEndGame = () => {
@@ -20,7 +20,7 @@ const StartCard = () => {
       {startGame ? (
         <Game
           gridSize={gridSize}
-          numberOfplayers={numberOfplayers}
+          numberOfPlayers={numberOfPlayers}
           handleEndGame={handleEndGame}
         />
       ) : (
@@ -104,7 +104,7 @@ const StartCard = () => {
                 height='48px'
                 bgcolor='#FDA214'
                 textcolor='#FCFCFC'
-                disabled={gridSize === 0 || numberOfplayers === 0}
+                disabled={gridSize === 0 || numberOfPlayers === 0}
                 handleClick={() => setStartGame(true)}
               >
                 Start Game
