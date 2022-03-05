@@ -1,4 +1,10 @@
-import React, { useState, useEffect, MouseEvent, useCallback } from 'react'
+import React, {
+  useState,
+  useEffect,
+  MouseEvent,
+  useCallback,
+  useReducer,
+} from 'react'
 import { ButtonComponent } from '../button'
 import Modal from '../modal'
 import './selected-game.css'
@@ -6,7 +12,7 @@ import classnames from 'classnames'
 
 interface SelectedProps {
   gridSize: number
-  numberOfplayers: number
+  numberOfPlayers: number
   handleEndGame: () => void
 }
 
@@ -18,13 +24,58 @@ type Grid = {
   }
 }
 
-interface PlayerScore {
-  player: number
-}
-
 interface Winner {
   player: number
   score: number
+}
+
+//useReducer to update multiple states
+enum PlayerActionKind {
+  One = 1,
+  Two = 2,
+  Three = 3,
+  Four = 4,
+  RESET = 'RESET',
+}
+
+interface PlayerAction {
+  type: PlayerActionKind
+}
+
+interface PlayerState {
+  player1: number
+  player2: number
+  player3: number
+  player4: number
+}
+
+const initialState = {
+  player1: 0,
+  player2: 0,
+  player3: 0,
+  player4: 0,
+}
+
+const playerReducer = (state: PlayerState, action: PlayerAction) => {
+  switch (action.type) {
+    case 1:
+      return { ...state, player1: state.player1 + 1 }
+
+    case 2:
+      return { ...state, player2: state.player2 + 1 }
+
+    case 3:
+      return { ...state, player3: state.player3 + 1 }
+
+    case 4:
+      return { ...state, player4: state.player4 + 1 }
+
+    case 'RESET':
+      return { ...initialState }
+
+    default:
+      return state
+  }
 }
 
 /* Randomize array in-place using Durstenfeld shuffle algorithm */
@@ -39,12 +90,11 @@ function shuffleArray(array: number[]) {
 
 const SelectedGame: React.FC<SelectedProps> = ({
   gridSize,
-  numberOfplayers,
+  numberOfPlayers,
   handleEndGame,
 }) => {
   const [showModal, setShowModal] = useState(false)
   const [grid, setGrid] = useState<Grid>({})
-  const [players] = useState(numberOfplayers)
   const [selection, setSelection] = useState<string[]>([])
   const [winnerScore, setWinnerScore] = useState<Winner[]>([])
   const [count, setCount] = useState(0)
@@ -54,11 +104,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
     useState<boolean>()
   const [randomArraySize, setRandomArraySize] = useState(0)
   const [currentPlayer, setCurrentPlayer] = useState(1)
-  const [playerScore, setPlayerScore] = useState<PlayerScore[]>([])
-  const [player1Score, setPlayer1Score] = useState({ player: 1, score: 0 })
-  const [player2Score, setPlayer2Score] = useState({ player: 2, score: 0 })
-  const [player3Score, setPlayer3Score] = useState({ player: 3, score: 0 })
-  const [player4Score, setPlayer4Score] = useState({ player: 4, score: 0 })
+  const [state, dispatch] = useReducer(playerReducer, initialState)
 
   const setNewGame = () => {
     handleRestart()
@@ -71,15 +117,11 @@ const SelectedGame: React.FC<SelectedProps> = ({
     setCount(0)
     setTimer(0)
     setCurrentPlayer(1)
-    setPlayerScore([])
     setSingleCompleted(false)
     setMultiplayerCompletedGame(false)
     setShowModal(false)
-    setPlayer1Score({ player: 1, score: 0 })
-    setPlayer2Score({ player: 2, score: 0 })
-    setPlayer3Score({ player: 3, score: 0 })
-    setPlayer4Score({ player: 4, score: 0 })
     setWinnerScore([])
+    dispatch({ type: PlayerActionKind.RESET })
   }
 
   const setGridValues = useCallback(() => {
@@ -165,7 +207,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
               [id as string]: { ...target_2, selected: true },
             }
           })
-          if (currentPlayer === numberOfplayers) {
+          if (currentPlayer === numberOfPlayers) {
             setCurrentPlayer(1)
           } else {
             setCurrentPlayer((prev) => prev + 1)
@@ -190,54 +232,26 @@ const SelectedGame: React.FC<SelectedProps> = ({
               [id as string]: { ...target_2, disabled: true, selected: true },
             }
           })
-          if (currentPlayer === numberOfplayers) {
+          if (currentPlayer === numberOfPlayers) {
             setCurrentPlayer(1)
           } else {
             setCurrentPlayer((prev) => prev + 1)
           }
 
-          setPlayerScore((prev) => [...prev, { player: currentPlayer }])
+          dispatch({ type: currentPlayer })
         }
         setSelection([])
       }
     }
   }
 
-  useEffect(() => {
-    playerScore.map((player) => {
-      if (player.player === 1) {
-        setPlayer1Score({ player: 1, score: player1Score.score + 1 })
-      } else {
-        setPlayer1Score({ player: 1, score: player1Score.score })
-      }
-
-      if (player.player === 2) {
-        setPlayer2Score({ player: 2, score: player2Score.score + 1 })
-      } else {
-        setPlayer2Score({ player: 2, score: player2Score.score })
-      }
-
-      if (player.player === 3) {
-        setPlayer3Score({ player: 3, score: player3Score.score + 1 })
-      } else {
-        setPlayer3Score({ player: 3, score: player3Score.score })
-      }
-
-      if (player.player === 4) {
-        setPlayer4Score({ player: 4, score: player4Score.score + 1 })
-      } else {
-        setPlayer4Score({ player: 4, score: player4Score.score })
-      }
-    })
-    // console.log(player.player === 1)
-  }, [playerScore])
-
+  console.log(state)
   useEffect(() => {
     const finished = Object.entries(grid).every(
       ([id, { value, selected, disabled }]) => disabled === true
     )
 
-    if (numberOfplayers === 1) {
+    if (numberOfPlayers === 1) {
       setSingleCompleted(finished)
       const timeInterval = setInterval(() => {
         if (!finished) {
@@ -250,28 +264,32 @@ const SelectedGame: React.FC<SelectedProps> = ({
     } else {
       setMultiplayerCompletedGame(finished)
     }
-  }, [grid, numberOfplayers])
+  }, [grid, numberOfPlayers])
 
   const showWinner = useCallback(() => {
     let winner: Winner[] = []
+    let playerOne = { player: 1, score: state.player1 }
+    let playerTwo = { player: 2, score: state.player2 }
+    let playerThree = { player: 3, score: state.player3 }
+    let playerFour = { player: 4, score: state.player4 }
 
-    switch (numberOfplayers) {
+    switch (numberOfPlayers) {
       case 2:
-        winner.push(player1Score, player2Score)
+        winner.push(playerOne, playerTwo)
         winner.sort((a, b) => b.score - a.score)
         break
       case 3:
-        winner.push(player1Score, player2Score, player3Score)
+        winner.push(playerOne, playerTwo, playerThree)
         winner.sort((a, b) => b.score - a.score)
         break
       case 4:
-        winner.push(player1Score, player2Score, player3Score, player4Score)
+        winner.push(playerOne, playerTwo, playerThree, playerFour)
         winner.sort((a, b) => b.score - a.score)
         break
     }
 
     setWinnerScore(winner)
-  }, [numberOfplayers, player1Score, player2Score, player3Score, player4Score])
+  }, [numberOfPlayers, state])
 
   useEffect(() => showWinner(), [showWinner, multiplayerCompletedGame])
 
@@ -324,9 +342,9 @@ const SelectedGame: React.FC<SelectedProps> = ({
 
       <div
         className='p-6 flex justify-between absolute bottom-2'
-        style={{ left: players === 2 ? '26%' : '0' }}
+        style={{ left: numberOfPlayers === 2 ? '26%' : '0' }}
       >
-        {players === 1 ? (
+        {numberOfPlayers === 1 ? (
           <>
             <div className='updates mr-3'>
               <p className='text-grey font-semibold'>Time</p>
@@ -338,7 +356,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
             </div>
           </>
         ) : (
-          [...Array(players)].map((player, index) => {
+          [...Array(numberOfPlayers)].map((player, index) => {
             return (
               <div
                 className={classnames(
@@ -352,12 +370,12 @@ const SelectedGame: React.FC<SelectedProps> = ({
                 <p className='player'>{`P ${index + 1}`}</p>
                 <h3 className='score'>
                   {index + 1 === 1
-                    ? player1Score.score
+                    ? state.player1
                     : index + 1 === 2
-                    ? player2Score.score
+                    ? state.player2
                     : index + 1 === 3
-                    ? player3Score.score
-                    : index + 1 === 4 && player4Score.score}
+                    ? state.player3
+                    : index + 1 === 4 && state.player4}
                 </h3>
               </div>
             )
