@@ -104,6 +104,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
     useState<boolean>()
   const [randomArraySize, setRandomArraySize] = useState(0)
   const [currentPlayer, setCurrentPlayer] = useState(1)
+  const [width] = useState(window.innerWidth)
   const [state, dispatch] = useReducer(playerReducer, initialState)
 
   const setNewGame = () => {
@@ -245,7 +246,6 @@ const SelectedGame: React.FC<SelectedProps> = ({
     }
   }
 
-  console.log(state)
   useEffect(() => {
     const finished = Object.entries(grid).every(
       ([id, { value, selected, disabled }]) => disabled === true
@@ -297,18 +297,42 @@ const SelectedGame: React.FC<SelectedProps> = ({
     <>
       <div className='Nav'>
         <h1 className='font-bold text-dark-blue text-2xl mb-10'>memory</h1>
-        <ButtonComponent
-          width='78px'
-          height='40px'
-          bgcolor='#FDA214'
-          textcolor='#fff'
-          handleClick={() => setShowModal(true)}
-        >
-          Menu
-        </ButtonComponent>
+        {width > 500 ? (
+          <div>
+            <ButtonComponent
+              width='127px'
+              height='52px'
+              bgcolor='#FDA214'
+              textcolor='#fff'
+              handleClick={handleRestart}
+              marginRight='15px'
+            >
+              Restart
+            </ButtonComponent>
+            <ButtonComponent
+              width='149px'
+              height='52px'
+              bgcolor='#DFE7EC'
+              textcolor='#304859'
+              handleClick={setNewGame}
+            >
+              New Game
+            </ButtonComponent>
+          </div>
+        ) : (
+          <ButtonComponent
+            width='78px'
+            height='40px'
+            bgcolor='#FDA214'
+            textcolor='#fff'
+            handleClick={() => setShowModal(true)}
+          >
+            Menu
+          </ButtonComponent>
+        )}
       </div>
       <div
-        className='flex justify-between flex-wrap w-80 m-auto'
+        className='flex justify-between flex-wrap w-80 m-auto mt-5'
         onClick={handleClick}
       >
         {/* convert an object to array */}
@@ -341,7 +365,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
       </div>
 
       <div
-        className='p-6 flex justify-between absolute bottom-2'
+        className='p-6 flex justify-center mt-32'
         style={{ left: numberOfPlayers === 2 ? '26%' : '0' }}
       >
         {numberOfPlayers === 1 ? (
@@ -360,7 +384,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
             return (
               <div
                 className={classnames(
-                  'w-16 h-20 rounded-md flex flex-col justify-center mr-3 ',
+                  'w-16 md:w-64 h-20 rounded-md flex flex-col md:flex-row justify-center md:justify-around mr-3 items-center',
                   {
                     'bg-ash': currentPlayer !== index + 1,
                     'bg-orange': currentPlayer === index + 1,
@@ -414,7 +438,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
       {singleCompleted && (
         <Modal
           handleClose={() => setShowModal(false)}
-          width='327px'
+          width={width > 500 ? '654px' : '327px'}
           height='376px'
         >
           <>
@@ -459,7 +483,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
       {multiplayerCompletedGame && (
         <Modal
           handleClose={() => setShowModal(false)}
-          width='327px'
+          width={width > 500 ? '654px' : '327px'}
           height='488px'
         >
           <>
@@ -479,6 +503,8 @@ const SelectedGame: React.FC<SelectedProps> = ({
                       'modal-timer-div',
                       'bg-ash',
                       'text-grey',
+                      'w-72',
+                      'md:w-96',
                       {
                         'text-white':
                           index === 0 || player.score === winnerScore[0].score,
@@ -506,25 +532,28 @@ const SelectedGame: React.FC<SelectedProps> = ({
                 )
               })}
             </div>
-            <ButtonComponent
-              width='279px'
-              height='48px'
-              bgcolor='#FDA214'
-              textcolor='#fff'
-              marginBottom='15px'
-              handleClick={handleRestart}
-            >
-              Restart
-            </ButtonComponent>
-            <ButtonComponent
-              width='279px'
-              height='48px'
-              bgcolor='#DFE7EC'
-              textcolor='#304859'
-              handleClick={setNewGame}
-            >
-              Setup New Game
-            </ButtonComponent>
+            <div className='lg:flex'>
+              <ButtonComponent
+                width={width > 500 ? '190px' : '279px'}
+                height='48px'
+                bgcolor='#FDA214'
+                textcolor='#fff'
+                marginBottom='15px'
+                handleClick={handleRestart}
+                marginRight='10px'
+              >
+                Restart
+              </ButtonComponent>
+              <ButtonComponent
+                width={width > 500 ? '190px' : '279px'}
+                height='48px'
+                bgcolor='#DFE7EC'
+                textcolor='#304859'
+                handleClick={setNewGame}
+              >
+                Setup New Game
+              </ButtonComponent>
+            </div>
           </>
         </Modal>
       )}
