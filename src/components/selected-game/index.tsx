@@ -246,228 +246,301 @@ const SelectedGame: React.FC<SelectedProps> = ({
     }
   }
 
-  useEffect(() => {
-    const finished = Object.entries(grid).every(
-      ([id, { value, selected, disabled }]) => disabled === true
-    )
+useEffect(() => {
+  const finished = Object.entries(grid).every(
+    ([id, { value, selected, disabled }]) => disabled === true
+  )
 
-    if (numberOfPlayers === 1) {
-      setSingleCompleted(finished)
-      const timeInterval = setInterval(() => {
-        if (!finished) {
-          setTimer((timer) => timer + 1)
-        }
-      }, 1000)
-      return () => {
-        clearInterval(timeInterval)
+  if (numberOfPlayers === 1) {
+    setSingleCompleted(finished)
+    const timeInterval = setInterval(() => {
+      if (!finished) {
+        setTimer((timer) => timer + 1)
       }
-    } else {
-      setMultiplayerCompletedGame(finished)
+    }, 1000)
+    return () => {
+      clearInterval(timeInterval)
     }
-  }, [grid, numberOfPlayers])
+  } else {
+    setMultiplayerCompletedGame(finished)
+  }
+}, [grid, numberOfPlayers])
 
-  const showWinner = useCallback(() => {
-    let winner: Winner[] = []
-    let playerOne = { player: 1, score: state.player1 }
-    let playerTwo = { player: 2, score: state.player2 }
-    let playerThree = { player: 3, score: state.player3 }
-    let playerFour = { player: 4, score: state.player4 }
+const showWinner = useCallback(() => {
+  let winner: Winner[] = []
+  let playerOne = { player: 1, score: state.player1 }
+  let playerTwo = { player: 2, score: state.player2 }
+  let playerThree = { player: 3, score: state.player3 }
+  let playerFour = { player: 4, score: state.player4 }
 
-    switch (numberOfPlayers) {
-      case 2:
-        winner.push(playerOne, playerTwo)
-        winner.sort((a, b) => b.score - a.score)
-        break
-      case 3:
-        winner.push(playerOne, playerTwo, playerThree)
-        winner.sort((a, b) => b.score - a.score)
-        break
-      case 4:
-        winner.push(playerOne, playerTwo, playerThree, playerFour)
-        winner.sort((a, b) => b.score - a.score)
-        break
-    }
+  switch (numberOfPlayers) {
+    case 2:
+      winner.push(playerOne, playerTwo)
+      winner.sort((a, b) => b.score - a.score)
+      break
+    case 3:
+      winner.push(playerOne, playerTwo, playerThree)
+      winner.sort((a, b) => b.score - a.score)
+      break
+    case 4:
+      winner.push(playerOne, playerTwo, playerThree, playerFour)
+      winner.sort((a, b) => b.score - a.score)
+      break
+  }
 
-    setWinnerScore(winner)
-  }, [numberOfPlayers, state])
+  setWinnerScore(winner)
+}, [numberOfPlayers, state])
 
-  useEffect(() => showWinner(), [showWinner, multiplayerCompletedGame])
+useEffect(() => showWinner(), [showWinner, multiplayerCompletedGame])
 
-  return (
-    <>
-      <div className='Nav'>
-        <h1 className='font-bold text-dark-blue text-2xl mb-10'>memory</h1>
-        {width > 500 ? (
-          <div>
-            <ButtonComponent
-              width='127px'
-              height='52px'
-              bgcolor='#FDA214'
-              textcolor='#fff'
-              handleClick={handleRestart}
-              marginRight='15px'
-            >
-              Restart
-            </ButtonComponent>
-            <ButtonComponent
-              width='149px'
-              height='52px'
-              bgcolor='#DFE7EC'
-              textcolor='#304859'
-              handleClick={setNewGame}
-            >
-              New Game
-            </ButtonComponent>
-          </div>
-        ) : (
+return (
+  <>
+    <div className='Nav'>
+      <h1 className='font-bold text-dark-blue text-2xl mb-10'>memory</h1>
+      {width > 500 ? (
+        <div>
           <ButtonComponent
-            width='78px'
-            height='40px'
+            width='127px'
+            height='52px'
             bgcolor='#FDA214'
             textcolor='#fff'
-            handleClick={() => setShowModal(true)}
+            handleClick={handleRestart}
+            marginRight='15px'
           >
-            Menu
+            Restart
           </ButtonComponent>
-        )}
-      </div>
-      <div
-        className='flex justify-between flex-wrap w-80 m-auto mt-5'
-        onClick={handleClick}
-      >
-        {/* convert an object to array */}
-        {Object.entries(grid).map(([id, { value, selected, disabled }]) => {
+          <ButtonComponent
+            width='149px'
+            height='52px'
+            bgcolor='#DFE7EC'
+            textcolor='#304859'
+            handleClick={setNewGame}
+          >
+            New Game
+          </ButtonComponent>
+        </div>
+      ) : (
+        <ButtonComponent
+          width='78px'
+          height='40px'
+          bgcolor='#FDA214'
+          textcolor='#fff'
+          handleClick={() => setShowModal(true)}
+        >
+          Menu
+        </ButtonComponent>
+      )}
+    </div>
+    <div
+      className='flex justify-between flex-wrap w-80 m-auto mt-5'
+      onClick={handleClick}
+    >
+      {/* convert an object to array */}
+      {Object.entries(grid).map(([id, { value, selected, disabled }]) => {
+        return (
+          <div
+            key={id}
+            data-id={id}
+            className={classnames('circleStyle', {
+              'pointer-events-none': selected,
+              'bg-navy-blue': !selected,
+              'bg-light-grey': selected && disabled,
+              'bg-orange': selected && !disabled,
+            })}
+            style={{
+              width: gridSize === 6 ? '46px' : '65px',
+              height: gridSize === 6 ? '46px' : '65px',
+              fontSize: gridSize === 6 ? '24px' : '40px',
+            }}
+          >
+            <p
+              data-id={id}
+              className={classnames('circleValue', { hidden: !selected })}
+            >
+              {value}
+            </p>
+          </div>
+        )
+      })}
+    </div>
+
+    <div
+      className='p-6 flex justify-center mt-32'
+      style={{ left: numberOfPlayers === 2 ? '26%' : '0' }}
+    >
+      {numberOfPlayers === 1 ? (
+        <>
+          <div className='updates mr-3'>
+            <p className='text-grey font-semibold'>Time</p>
+            <p>{updateTimer()}</p>
+          </div>
+          <div className='updates'>
+            <p className='text-grey font-semibold'>Moves</p>
+            <p>{count}</p>
+          </div>
+        </>
+      ) : (
+        [...Array(numberOfPlayers)].map((player, index) => {
           return (
             <div
-              key={id}
-              data-id={id}
-              className={classnames('circleStyle', {
-                'pointer-events-none': disabled,
-                'bg-navy-blue': !selected,
-                'bg-light-grey': selected && disabled,
-                'bg-orange': selected && !disabled,
-              })}
-              style={{
-                width: gridSize === 6 ? '46px' : '65px',
-                height: gridSize === 6 ? '46px' : '65px',
-                fontSize: gridSize === 6 ? '24px' : '40px',
-              }}
+              className={classnames(
+                'w-16 md:w-64 h-20 rounded-md flex flex-col md:flex-row justify-center md:justify-around mr-3 items-center',
+                {
+                  'bg-ash': currentPlayer !== index + 1,
+                  'bg-orange': currentPlayer === index + 1,
+                }
+              )}
             >
-              <p
-                data-id={id}
-                className={classnames('circleValue', { hidden: !selected })}
-              >
-                {value}
-              </p>
+              <p className='player'>{`P ${index + 1}`}</p>
+              <h3 className='score'>
+                {index + 1 === 1
+                  ? state.player1
+                  : index + 1 === 2
+                  ? state.player2
+                  : index + 1 === 3
+                  ? state.player3
+                  : index + 1 === 4 && state.player4}
+              </h3>
             </div>
           )
-        })}
-      </div>
-
-      <div
-        className='p-6 flex justify-center mt-32'
-        style={{ left: numberOfPlayers === 2 ? '26%' : '0' }}
-      >
-        {numberOfPlayers === 1 ? (
-          <>
-            <div className='updates mr-3'>
-              <p className='text-grey font-semibold'>Time</p>
-              <p>{updateTimer()}</p>
-            </div>
-            <div className='updates'>
-              <p className='text-grey font-semibold'>Moves</p>
-              <p>{count}</p>
-            </div>
-          </>
-        ) : (
-          [...Array(numberOfPlayers)].map((player, index) => {
-            return (
-              <div
-                className={classnames(
-                  'w-16 md:w-64 h-20 rounded-md flex flex-col md:flex-row justify-center md:justify-around mr-3 items-center',
-                  {
-                    'bg-ash': currentPlayer !== index + 1,
-                    'bg-orange': currentPlayer === index + 1,
-                  }
-                )}
-              >
-                <p className='player'>{`P ${index + 1}`}</p>
-                <h3 className='score'>
-                  {index + 1 === 1
-                    ? state.player1
-                    : index + 1 === 2
-                    ? state.player2
-                    : index + 1 === 3
-                    ? state.player3
-                    : index + 1 === 4 && state.player4}
-                </h3>
-              </div>
-            )
-          })
-        )}
-      </div>
-
-      {/* show modal on click of menu button */}
-      {showModal && (
-        <Modal handleClose={() => setShowModal(false)}>
-          <>
-            <ButtonComponent
-              width='279px'
-              height='48px'
-              bgcolor='#FDA214'
-              textcolor='#fff'
-              marginBottom='20px'
-              handleClick={handleRestart}
-            >
-              Restart
-            </ButtonComponent>
-            <ButtonComponent
-              width='279px'
-              height='48px'
-              bgcolor='#DFE7EC'
-              textcolor='#fff'
-              handleClick={setNewGame}
-            >
-              New Game
-            </ButtonComponent>
-          </>
-        </Modal>
+        })
       )}
+    </div>
 
-      {/* show modal when game is completed for a single player */}
-      {singleCompleted && (
-        <Modal
-          handleClose={() => setShowModal(false)}
-          width={width > 500 ? '654px' : '327px'}
-          height='376px'
-        >
-          <>
-            <h1 className='modal2-heading'>You did it!</h1>
-            <p className='modal2-subheading'>
-              Game over! Here’s how you got on…
-            </p>
-            <div style={{ margin: '25px auto' }}>
-              <div className='modal-timer-div' style={{ marginBottom: '10px' }}>
-                <p className='modal-timer-text'>Time Elapsed</p>
-                <p className='modal-timer-text2'>{updateTimer()}</p>
-              </div>
-              <div className='modal-timer-div'>
-                <p className='modal-timer-text'>Moves Taken</p>
-                <p className='modal-timer-text2'>{`${count} Moves`}</p>
-              </div>
+    {/* show modal on click of menu button */}
+    {showModal && (
+      <Modal handleClose={() => setShowModal(false)}>
+        <>
+          <ButtonComponent
+            width='279px'
+            height='48px'
+            bgcolor='#FDA214'
+            textcolor='#fff'
+            marginBottom='20px'
+            handleClick={handleRestart}
+          >
+            Restart
+          </ButtonComponent>
+          <ButtonComponent
+            width='279px'
+            height='48px'
+            bgcolor='#DFE7EC'
+            textcolor='#fff'
+            handleClick={setNewGame}
+          >
+            New Game
+          </ButtonComponent>
+        </>
+      </Modal>
+    )}
+
+    {/* show modal when game is completed for a single player */}
+    {singleCompleted && (
+      <Modal
+        handleClose={() => setShowModal(false)}
+        width={width > 500 ? '654px' : '327px'}
+        height='376px'
+      >
+        <>
+          <h1 className='modal2-heading'>You did it!</h1>
+          <p className='modal2-subheading'>Game over! Here’s how you got on…</p>
+          <div style={{ margin: '25px auto' }}>
+            <div className='modal-timer-div' style={{ marginBottom: '10px' }}>
+              <p className='modal-timer-text'>Time Elapsed</p>
+              <p className='modal-timer-text2'>{updateTimer()}</p>
             </div>
+            <div className='modal-timer-div'>
+              <p className='modal-timer-text'>Moves Taken</p>
+              <p className='modal-timer-text2'>{`${count} Moves`}</p>
+            </div>
+          </div>
+          <ButtonComponent
+            width='279px'
+            height='48px'
+            bgcolor='#FDA214'
+            textcolor='#fff'
+            marginBottom='15px'
+            handleClick={handleRestart}
+          >
+            Restart
+          </ButtonComponent>
+          <ButtonComponent
+            width='279px'
+            height='48px'
+            bgcolor='#DFE7EC'
+            textcolor='#304859'
+            handleClick={setNewGame}
+          >
+            Setup New Game
+          </ButtonComponent>
+        </>
+      </Modal>
+    )}
+
+    {/* show modal when game is completed for multiplayer */}
+    {multiplayerCompletedGame && (
+      <Modal
+        handleClose={() => setShowModal(false)}
+        width={width > 500 ? '654px' : '327px'}
+        height='488px'
+      >
+        <>
+          <h1 className='modal2-heading'>
+            {winnerScore[0].score === winnerScore[1].score
+              ? 'It’s a tie!'
+              : `Player ${winnerScore[0].player} Wins!`}
+          </h1>
+          <p className='modal2-subheading'>Game over! Here are the results…</p>
+          <div style={{ margin: '25px auto' }}>
+            {winnerScore.map((player, index) => {
+              return (
+                <div
+                  className={classnames(
+                    'modal-timer-div',
+                    'bg-ash',
+                    'text-grey',
+                    'w-72',
+                    'md:w-96',
+                    {
+                      'text-white':
+                        index === 0 || player.score === winnerScore[0].score,
+                      'bg-dark-blue':
+                        index === 0 || player.score === winnerScore[0].score,
+                    }
+                  )}
+                  style={{ marginBottom: '10px' }}
+                >
+                  <p className='modal-timer-text'>Player {player.player}</p>
+                  <p
+                    className={classnames(
+                      'modal-timer-text2',
+                      'text-dark-blue',
+                      {
+                        'text-white':
+                          index === 0 || player.score === winnerScore[0].score,
+                      }
+                    )}
+                  >
+                    {player.score}Pairs
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+          <div className='lg:flex'>
             <ButtonComponent
-              width='279px'
+              width={width > 500 ? '190px' : '279px'}
               height='48px'
               bgcolor='#FDA214'
               textcolor='#fff'
               marginBottom='15px'
               handleClick={handleRestart}
+              marginRight='10px'
             >
               Restart
             </ButtonComponent>
             <ButtonComponent
-              width='279px'
+              width={width > 500 ? '190px' : '279px'}
               height='48px'
               bgcolor='#DFE7EC'
               textcolor='#304859'
@@ -475,90 +548,12 @@ const SelectedGame: React.FC<SelectedProps> = ({
             >
               Setup New Game
             </ButtonComponent>
-          </>
-        </Modal>
-      )}
-
-      {/* show modal when game is completed for multiplayer */}
-      {multiplayerCompletedGame && (
-        <Modal
-          handleClose={() => setShowModal(false)}
-          width={width > 500 ? '654px' : '327px'}
-          height='488px'
-        >
-          <>
-            <h1 className='modal2-heading'>
-              {winnerScore[0].score === winnerScore[1].score
-                ? 'It’s a tie!'
-                : `Player ${winnerScore[0].player} Wins!`}
-            </h1>
-            <p className='modal2-subheading'>
-              Game over! Here are the results…
-            </p>
-            <div style={{ margin: '25px auto' }}>
-              {winnerScore.map((player, index) => {
-                return (
-                  <div
-                    className={classnames(
-                      'modal-timer-div',
-                      'bg-ash',
-                      'text-grey',
-                      'w-72',
-                      'md:w-96',
-                      {
-                        'text-white':
-                          index === 0 || player.score === winnerScore[0].score,
-                        'bg-dark-blue':
-                          index === 0 || player.score === winnerScore[0].score,
-                      }
-                    )}
-                    style={{ marginBottom: '10px' }}
-                  >
-                    <p className='modal-timer-text'>Player {player.player}</p>
-                    <p
-                      className={classnames(
-                        'modal-timer-text2',
-                        'text-dark-blue',
-                        {
-                          'text-white':
-                            index === 0 ||
-                            player.score === winnerScore[0].score,
-                        }
-                      )}
-                    >
-                      {player.score}Pairs
-                    </p>
-                  </div>
-                )
-              })}
-            </div>
-            <div className='lg:flex'>
-              <ButtonComponent
-                width={width > 500 ? '190px' : '279px'}
-                height='48px'
-                bgcolor='#FDA214'
-                textcolor='#fff'
-                marginBottom='15px'
-                handleClick={handleRestart}
-                marginRight='10px'
-              >
-                Restart
-              </ButtonComponent>
-              <ButtonComponent
-                width={width > 500 ? '190px' : '279px'}
-                height='48px'
-                bgcolor='#DFE7EC'
-                textcolor='#304859'
-                handleClick={setNewGame}
-              >
-                Setup New Game
-              </ButtonComponent>
-            </div>
-          </>
-        </Modal>
-      )}
-    </>
-  )
+          </div>
+        </>
+      </Modal>
+    )}
+  </>
+)
 }
 
 export default SelectedGame
