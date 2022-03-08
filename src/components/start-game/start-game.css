@@ -1,12 +1,9 @@
 .card-container {
-  /* width: 327px; */
-/* height: 386px; */
 background: #FCFCFC;
 border-radius: 10px;
 display: flex;
     flex-direction: column;
     align-items: center;
-    /* padding: 4px 0px; */
 }
 
 .section-container {
