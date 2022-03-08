@@ -32,7 +32,6 @@ color: #304859;
 }
 
 .circleStyle {
-  /* background-color:#304859; */
              color:#fff;
              border-radius:50%;
               margin-bottom:10px;
@@ -58,9 +57,7 @@ color: #152938;
 }
 
 .modal-timer-div {
-  /* width: 279px; */
 height: 48px;
-/* background: #DFE7EC; */
 border-radius: 5px;
 display: flex;
 justify-content: space-between;
