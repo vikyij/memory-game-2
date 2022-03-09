@@ -6,7 +6,6 @@ import React, {
   useReducer,
   ReactElement,
 } from 'react'
-import { ButtonComponent } from '../button'
 import Modal from '../modal'
 import './selected-game.css'
 import classnames from 'classnames'
@@ -376,37 +375,27 @@ const SelectedGame: React.FC<SelectedProps> = ({
       <div className='Nav'>
         <h1 className='font-bold text-dark-blue text-2xl mb-10'>memory</h1>
         {width > 500 ? (
-          <div>
-            <ButtonComponent
-              width='127px'
-              height='52px'
-              bgcolor='#FDA214'
-              textcolor='#fff'
-              handleClick={handleRestart}
-              marginRight='15px'
+          <div className='flex justify-center items-center'>
+            <div
+              className='w-32 h-12 bg-orange hover:opacity-70 text-white mr-3.5 rounded-3xl flex justify-center items-center cursor-pointer'
+              onClick={handleRestart}
             >
               Restart
-            </ButtonComponent>
-            <ButtonComponent
-              width='149px'
-              height='52px'
-              bgcolor='#DFE7EC'
-              textcolor='#304859'
-              handleClick={setNewGame}
+            </div>
+            <div
+              className='w-40 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white mr-3.5 rounded-3xl flex justify-center items-center cursor-pointer'
+              onClick={setNewGame}
             >
               New Game
-            </ButtonComponent>
+            </div>
           </div>
         ) : (
-          <ButtonComponent
-            width='78px'
-            height='40px'
-            bgcolor='#FDA214'
-            textcolor='#fff'
-            handleClick={() => setShowModal(true)}
+          <div
+            className='w-20 h-10 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
+            onClick={() => setShowModal(true)}
           >
             Menu
-          </ButtonComponent>
+          </div>
         )}
       </div>
 
@@ -498,25 +487,18 @@ const SelectedGame: React.FC<SelectedProps> = ({
       {showModal && (
         <Modal handleClose={() => setShowModal(false)}>
           <>
-            <ButtonComponent
-              width='279px'
-              height='48px'
-              bgcolor='#FDA214'
-              textcolor='#fff'
-              marginBottom='20px'
-              handleClick={handleRestart}
+            <div
+              className='w-72 h-12 mb-5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
+              onClick={handleRestart}
             >
               Restart
-            </ButtonComponent>
-            <ButtonComponent
-              width='279px'
-              height='48px'
-              bgcolor='#DFE7EC'
-              textcolor='#fff'
-              handleClick={setNewGame}
+            </div>
+            <div
+              className='w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer'
+              onClick={setNewGame}
             >
               New Game
-            </ButtonComponent>
+            </div>
           </>
         </Modal>
       )}
@@ -534,34 +516,46 @@ const SelectedGame: React.FC<SelectedProps> = ({
               Game over! Here’s how you got on…
             </p>
             <div style={{ margin: '25px auto' }}>
-              <div className='modal-timer-div' style={{ marginBottom: '10px' }}>
-                <p className='modal-timer-text'>Time Elapsed</p>
-                <p className='modal-timer-text2'>{updateTimer()}</p>
+              <div
+                className='modal-timer-div w-64 md:w-96 h-12 bg-ash'
+                style={{ marginBottom: '10px' }}
+              >
+                <p className='modal-timer-text text-grey'>Time Elapsed</p>
+                <p className='modal-timer-text2 text-navy-blue'>
+                  {updateTimer()}
+                </p>
               </div>
-              <div className='modal-timer-div'>
-                <p className='modal-timer-text'>Moves Taken</p>
-                <p className='modal-timer-text2'>{`${count} Moves`}</p>
+              <div className='modal-timer-div w-64 md:w-96 h-12 bg-ash'>
+                <p className='modal-timer-text text-grey'>Moves Taken</p>
+                <p className='modal-timer-text2 text-navy-blue'>{`${count} Moves`}</p>
               </div>
             </div>
-            <ButtonComponent
-              width='279px'
-              height='48px'
-              bgcolor='#FDA214'
-              textcolor='#fff'
-              marginBottom='15px'
-              handleClick={handleRestart}
-            >
-              Restart
-            </ButtonComponent>
-            <ButtonComponent
-              width='279px'
-              height='48px'
-              bgcolor='#DFE7EC'
-              textcolor='#304859'
-              handleClick={setNewGame}
-            >
-              Setup New Game
-            </ButtonComponent>
+            <div className='md:flex'>
+              <div
+                className={classnames(
+                  'w-72 h-12 mb-5 mr-2.5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer',
+                  {
+                    'w-48': width > 500,
+                    'w-72': width < 500,
+                  }
+                )}
+                onClick={handleRestart}
+              >
+                Restart
+              </div>
+              <div
+                className={classnames(
+                  'w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
+                  {
+                    'w-48': width > 500,
+                    'w-72': width < 500,
+                  }
+                )}
+                onClick={setNewGame}
+              >
+                New Game
+              </div>
+            </div>
           </>
         </Modal>
       )}
@@ -621,26 +615,30 @@ const SelectedGame: React.FC<SelectedProps> = ({
               })}
             </div>
             <div className='lg:flex'>
-              <ButtonComponent
-                width={width > 500 ? '190px' : '279px'}
-                height='48px'
-                bgcolor='#FDA214'
-                textcolor='#fff'
-                marginBottom='15px'
-                handleClick={handleRestart}
-                marginRight='10px'
+              <div
+                className={classnames(
+                  'w-72 h-12 mb-5 mr-2.5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer',
+                  {
+                    'w-48': width > 500,
+                    'w-72': width < 500,
+                  }
+                )}
+                onClick={handleRestart}
               >
                 Restart
-              </ButtonComponent>
-              <ButtonComponent
-                width={width > 500 ? '190px' : '279px'}
-                height='48px'
-                bgcolor='#DFE7EC'
-                textcolor='#304859'
-                handleClick={setNewGame}
+              </div>
+              <div
+                className={classnames(
+                  'w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
+                  {
+                    'w-48': width > 500,
+                    'w-72': width < 500,
+                  }
+                )}
+                onClick={setNewGame}
               >
-                Setup New Game
-              </ButtonComponent>
+                New Game
+              </div>
             </div>
           </>
         </Modal>
