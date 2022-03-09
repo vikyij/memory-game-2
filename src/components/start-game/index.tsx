@@ -36,13 +36,25 @@ const StartCard = () => {
               <h3 className='sub-heading'>Select Theme</h3>
               <div className='flex'>
                 <div
-                  className='w-32 lg:w-64 h-10 lg:h-12 bg-navy-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer'
+                  className={classNames(
+                    'w-32 lg:w-64 h-10 lg:h-12  hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer',
+                    {
+                      'bg-light-grey': theme !== 'number',
+                      'bg-navy-blue': theme === 'number',
+                    }
+                  )}
                   onClick={() => setTheme('number')}
                 >
                   Numbers
                 </div>
                 <div
-                  className='w-32 lg:w-64 h-10 lg:h-12 bg-light-grey text-off-white rounded-3xl flex justify-center items-center cursor-pointer'
+                  className={classNames(
+                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue  active:bg-navy-blue text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
+                    {
+                      'bg-light-grey': theme !== 'icon',
+                      'bg-navy-blue': theme === 'icon',
+                    }
+                  )}
                   onClick={() => setTheme('icon')}
                 >
                   Icons
@@ -57,7 +69,13 @@ const StartCard = () => {
                   return (
                     <div
                       key={index}
-                      className='w-14 lg:w-32 h-10 lg:h-12 bg-light-grey text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer'
+                      className={classNames(
+                        'w-14 lg:w-32 h-10 lg:h-12 hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer',
+                        {
+                          'bg-light-grey': numberOfPlayers !== index + 1,
+                          'bg-navy-blue': numberOfPlayers === index + 1,
+                        }
+                      )}
                       onClick={() => setNumberOfPlayers(index + 1)}
                     >
                       {(index + 1).toString()}
@@ -71,13 +89,25 @@ const StartCard = () => {
               <h3 className='sub-heading'>Grid Size</h3>
               <div className='flex'>
                 <div
-                  className='w-32 lg:w-64 h-10 lg:h-12 bg-navy-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer'
+                  className={classNames(
+                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer',
+                    {
+                      'bg-light-grey': gridSize !== 4,
+                      'bg-navy-blue': gridSize === 4,
+                    }
+                  )}
                   onClick={() => setGridSize(4)}
                 >
                   4x4
                 </div>
                 <div
-                  className='w-32 lg:w-64 h-10 lg:h-12 bg-light-grey text-off-white rounded-3xl flex justify-center items-center cursor-pointer'
+                  className={classNames(
+                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
+                    {
+                      'bg-light-grey': gridSize !== 6,
+                      'bg-navy-blue': gridSize === 6,
+                    }
+                  )}
                   onClick={() => setGridSize(6)}
                 >
                   6x6
@@ -91,7 +121,7 @@ const StartCard = () => {
             >
               <div
                 className={classNames(
-                  'w-72 lg:w-4/5 h-10 lg:h-12 bg-orange text-off-white rounded-3xl flex justify-center items-center',
+                  'w-72 lg:w-4/5 h-10 lg:h-12 bg-orange text-off-white rounded-3xl flex justify-center items-center hover:opacity-70',
                   {
                     'cursor-pointer':
                       gridSize !== 0 && numberOfPlayers !== 0 && theme !== '',

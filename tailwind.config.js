@@ -11,6 +11,7 @@ module.exports = {
       orange: '#FDA214',
       'navy-blue': '#304859',
       ash: '#DFE7EC',
+      'light-blue': '#6395B8',
     },
     screens: {
       sm: '500px',
