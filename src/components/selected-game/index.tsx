@@ -49,30 +49,30 @@ enum PlayerActionKind {
   RESET = 'RESET',
 }
 
-enum SinglePlayerKind {
+enum PlayerStateTypes {
   count = 'COUNT',
   timer = 'TIMER',
   singleCompleted = 'SINGLECOMPLETED',
   currentPlayer = 'CURRENTPLAYER',
-  multiplayerCompleted= 'MULTIPLAYERCOMPLETED',
+  multiplayerCompleted = 'MULTIPLAYERCOMPLETED',
   showMenuModal = 'SHOWMENUMODAL',
   resetCurrentPlayer = 'RESETCURRENTPLAYER',
   resetGame = 'RESETGAME',
 }
 
 // interfaces
-interface PlayerAction {
+interface PlayersScoreAction {
   type: PlayerActionKind
 }
 
-interface SinglePlayerAction {
-  type: SinglePlayerKind
+interface PlayersActions {
+  type: PlayerStateTypes
   singleCompletedPayload?: boolean
   multiCompletedPayload?: boolean
   menuModalPayload?: boolean
 }
 
-interface PlayerState {
+interface PlayersScoreState {
   player1: number
   player2: number
   player3: number
@@ -86,7 +86,10 @@ const initialState = {
   player4: 0,
 }
 
-const playerScoreReducer = (state: PlayerState, action: PlayerAction) => {
+const playerScoreReducer = (
+  state: PlayersScoreState,
+  action: PlayersScoreAction
+) => {
   switch (action.type) {
     case 1:
       return { ...state, player1: state.player1 + 1 }
@@ -108,7 +111,7 @@ const playerScoreReducer = (state: PlayerState, action: PlayerAction) => {
   }
 }
 
-interface singlePlayerState {
+interface PlayersState {
   count: number
   timer: number
   currentPlayer: number
@@ -117,7 +120,7 @@ interface singlePlayerState {
   showMenuModal?: boolean
 }
 
-const initialSinglePlayerState = {
+const initialPlayersState = {
   count: 0,
   timer: 0,
   currentPlayer: 1,
@@ -126,10 +129,7 @@ const initialSinglePlayerState = {
   showMenuModal: false,
 }
 
-const singlePlayerReducer = (
-  state: singlePlayerState,
-  action: SinglePlayerAction
-) => {
+const PlayersReducer = (state: PlayersState, action: PlayersActions) => {
   switch (action.type) {
     case 'COUNT':
       return { ...state, count: state.count + 1 }
@@ -146,14 +146,14 @@ const singlePlayerReducer = (
     case 'SINGLECOMPLETED':
       return { ...state, singleCompleted: action.singleCompletedPayload }
 
-    case 'MULTIPLAYERCOMPLETED': 
-      return { ...state, multiCompleted: action.multiCompletedPayload}
+    case 'MULTIPLAYERCOMPLETED':
+      return { ...state, multiCompleted: action.multiCompletedPayload }
 
-    case 'SHOWMENUMODAL': 
-      return {...state, showMenuModal: action.menuModalPayload}
+    case 'SHOWMENUMODAL':
+      return { ...state, showMenuModal: action.menuModalPayload }
 
     case 'RESETGAME':
-      return { ...initialSinglePlayerState }
+      return { ...initialPlayersState }
 
     default:
       return state
@@ -189,7 +189,6 @@ const SelectedGame: React.FC<SelectedProps> = ({
   theme,
   handleEndGame,
 }) => {
-  
   const [grid, setGrid] = useState<Grid>({})
   const [selection, setSelection] = useState<string[]>([])
   const [winnerScore, setWinnerScore] = useState<Winner[]>([])
@@ -198,9 +197,9 @@ const SelectedGame: React.FC<SelectedProps> = ({
 
   const [width] = useState(window.innerWidth)
   const [state, dispatch] = useReducer(playerScoreReducer, initialState)
-  const [singleState, singleDispatch] = useReducer(
-    singlePlayerReducer,
-    initialSinglePlayerState
+  const [playersUpdatedState, playersDispatch] = useReducer(
+    PlayersReducer,
+    initialPlayersState
   )
 
   const setNewGame = () => {
@@ -213,7 +212,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
     gridTimeout()
     setWinnerScore([])
     dispatch({ type: PlayerActionKind.RESET })
-    singleDispatch({ type: SinglePlayerKind.resetGame })
+    playersDispatch({ type: PlayerStateTypes.resetGame })
   }
 
   const setGridValues = useCallback(() => {
@@ -304,7 +303,6 @@ const SelectedGame: React.FC<SelectedProps> = ({
           }),
         2000
       )
-
     }
 
     return () => clearTimeout(initialTimeout)
@@ -319,11 +317,13 @@ const SelectedGame: React.FC<SelectedProps> = ({
   }, [gridTimeout])
 
   const updateTimer = () => {
-    const getSeconds = `0${singleState.timer % 60}`.slice(-2)
-    const minutes = `${Math.floor(singleState.timer / 60)}`
+    const getSeconds = `0${playersUpdatedState.timer % 60}`.slice(-2)
+    const minutes = `${Math.floor(playersUpdatedState.timer / 60)}`
     // added + because of a typescript error 'The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type'
     const getMinutes = `0${+minutes % 60}`.slice(-2)
-    const getHours = `0${Math.floor(singleState.timer / 3600)}`.slice(-2)
+    const getHours = `0${Math.floor(playersUpdatedState.timer / 3600)}`.slice(
+      -2
+    )
     return `${getHours} : ${getMinutes} : ${getSeconds}`
   }
 
@@ -331,8 +331,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
     ev.stopPropagation()
     let id = (ev.target as HTMLDivElement).getAttribute('data-id')
 
-    //setCount((count) => count + 1)
-    singleDispatch({ type: SinglePlayerKind.count })
+    playersDispatch({ type: PlayerStateTypes.count })
 
     if (id) {
       if (selection.length === 0) {
@@ -356,12 +355,12 @@ const SelectedGame: React.FC<SelectedProps> = ({
               [id as string]: { ...target_2, selected: true },
             }
           })
-          if (singleState.currentPlayer === numberOfPlayers) {
+          if (playersUpdatedState.currentPlayer === numberOfPlayers) {
             //setCurrentPlayer(1)
-            singleDispatch({ type: SinglePlayerKind.resetCurrentPlayer })
+            playersDispatch({ type: PlayerStateTypes.resetCurrentPlayer })
           } else {
             // setCurrentPlayer((prev) => prev + 1)
-            singleDispatch({ type: SinglePlayerKind.currentPlayer })
+            playersDispatch({ type: PlayerStateTypes.currentPlayer })
           }
 
           setTimeout(
@@ -384,13 +383,13 @@ const SelectedGame: React.FC<SelectedProps> = ({
             }
           })
 
-          if (singleState.currentPlayer === numberOfPlayers) {
-            singleDispatch({ type: SinglePlayerKind.resetCurrentPlayer })
+          if (playersUpdatedState.currentPlayer === numberOfPlayers) {
+            playersDispatch({ type: PlayerStateTypes.resetCurrentPlayer })
           } else {
-            singleDispatch({ type: SinglePlayerKind.currentPlayer })
+            playersDispatch({ type: PlayerStateTypes.currentPlayer })
           }
 
-          dispatch({ type: singleState.currentPlayer })
+          dispatch({ type: playersUpdatedState.currentPlayer })
         }
         setSelection([])
       }
@@ -403,21 +402,21 @@ const SelectedGame: React.FC<SelectedProps> = ({
     )
 
     if (numberOfPlayers === 1) {
-      singleDispatch({
-        type: SinglePlayerKind.singleCompleted,
+      playersDispatch({
+        type: PlayerStateTypes.singleCompleted,
         singleCompletedPayload: finished,
       })
       const timeInterval = setInterval(() => {
         if (!finished) {
-          singleDispatch({ type: SinglePlayerKind.timer })
+          playersDispatch({ type: PlayerStateTypes.timer })
         }
       }, 1000)
       return () => {
         clearInterval(timeInterval)
       }
     } else {
-      singleDispatch({
-        type: SinglePlayerKind.multiplayerCompleted,
+      playersDispatch({
+        type: PlayerStateTypes.multiplayerCompleted,
         multiCompletedPayload: finished,
       })
     }
@@ -445,7 +444,10 @@ const SelectedGame: React.FC<SelectedProps> = ({
     setWinnerScore(winner)
   }, [numberOfPlayers, state])
 
-  useEffect(() => showWinner(), [showWinner, singleState.multiCompleted])
+  useEffect(
+    () => showWinner(),
+    [showWinner, playersUpdatedState.multiCompleted]
+  )
 
   return (
     <>
@@ -469,7 +471,12 @@ const SelectedGame: React.FC<SelectedProps> = ({
         ) : (
           <div
             className='w-20 h-10 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
-            onClick={()=>singleDispatch({type: SinglePlayerKind.showMenuModal, menuModalPayload: true})}
+            onClick={() =>
+              playersDispatch({
+                type: PlayerStateTypes.showMenuModal,
+                menuModalPayload: true,
+              })
+            }
           >
             Menu
           </div>
@@ -528,7 +535,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
             </div>
             <div className='updates'>
               <p className='text-grey font-semibold'>Moves</p>
-              <p>{singleState.count}</p>
+              <p>{playersUpdatedState.count}</p>
             </div>
           </>
         ) : (
@@ -539,8 +546,9 @@ const SelectedGame: React.FC<SelectedProps> = ({
                 className={classnames(
                   'w-16 md:w-64 h-20 rounded-md flex flex-col md:flex-row justify-center md:justify-around mr-3 items-center',
                   {
-                    'bg-ash': singleState.currentPlayer !== index + 1,
-                    'bg-orange': singleState.currentPlayer === index + 1,
+                    'bg-ash': playersUpdatedState.currentPlayer !== index + 1,
+                    'bg-orange':
+                      playersUpdatedState.currentPlayer === index + 1,
                   }
                 )}
               >
@@ -561,8 +569,15 @@ const SelectedGame: React.FC<SelectedProps> = ({
       </div>
 
       {/* show modal on click of menu button */}
-      {singleState.showMenuModal && (
-        <Modal handleClose={()=>singleDispatch({type: SinglePlayerKind.showMenuModal, menuModalPayload: false})}>
+      {playersUpdatedState.showMenuModal && (
+        <Modal
+          handleClose={() =>
+            playersDispatch({
+              type: PlayerStateTypes.showMenuModal,
+              menuModalPayload: false,
+            })
+          }
+        >
           <>
             <div
               className='w-72 h-12 mb-5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
@@ -581,11 +596,8 @@ const SelectedGame: React.FC<SelectedProps> = ({
       )}
 
       {/* show modal when game is completed for a single player */}
-      {singleState.singleCompleted && (
-        <Modal
-          width={width > 500 ? '654px' : '327px'}
-          height='376px'
-        >
+      {playersUpdatedState.singleCompleted && (
+        <Modal width={width > 500 ? '654px' : '327px'} height='376px'>
           <>
             <h1 className='modal2-heading'>You did it!</h1>
             <p className='modal2-subheading'>
@@ -603,7 +615,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
               </div>
               <div className='modal-timer-div w-64 md:w-96 h-12 bg-ash'>
                 <p className='modal-timer-text text-grey'>Moves Taken</p>
-                <p className='modal-timer-text2 text-navy-blue'>{`${singleState.count} Moves`}</p>
+                <p className='modal-timer-text2 text-navy-blue'>{`${playersUpdatedState.count} Moves`}</p>
               </div>
             </div>
             <div className='md:flex'>
@@ -637,11 +649,8 @@ const SelectedGame: React.FC<SelectedProps> = ({
       )}
 
       {/* show modal when game is completed for multiplayer */}
-      {singleState.multiCompleted && (
-        <Modal
-          width={width > 500 ? '654px' : '327px'}
-          height='488px'
-        >
+      {playersUpdatedState.multiCompleted && (
+        <Modal width={width > 500 ? '654px' : '327px'} height='488px'>
           <>
             <h1 className='modal2-heading'>
               {winnerScore[0].score === winnerScore[1].score
