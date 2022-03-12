@@ -5,7 +5,7 @@ interface ModalProps {
   width?: string
   height?: string
   children: React.ReactNode
-  handleClose: () => void
+  handleClose?: () => void
 }
 
 const Modal: React.FC<ModalProps> = ({
