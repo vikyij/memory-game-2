@@ -489,11 +489,12 @@ const SelectedGame: React.FC<SelectedProps> = ({
       >
         {/* convert an object to array */}
         {Object.entries(grid).map(
-          ([id, { value, icon, selected, disabled }]) => {
+          ([id, { value, icon, selected, disabled }], index) => {
             return (
               <div
                 key={id}
                 data-id={id}
+                data-testid={index + 1}
                 className={classnames('circleStyle', {
                   'pointer-events-none': selected,
                   'bg-navy-blue': !selected,
@@ -508,6 +509,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
               >
                 <p
                   data-id={id}
+                  data-testid = {`grid-value${index + 1}`}
                   className={classnames('circleValue', {
                     hidden: !selected,
                     'p-2': theme === 'icon' && gridSize === 6,
@@ -530,11 +532,15 @@ const SelectedGame: React.FC<SelectedProps> = ({
         {numberOfPlayers === 1 ? (
           <>
             <div className='updates mr-3'>
-              <p className='text-grey font-semibold'>Time</p>
+              <p className='text-grey font-semibold' data-testid='time'>
+                Time
+              </p>
               <p>{updateTimer()}</p>
             </div>
             <div className='updates'>
-              <p className='text-grey font-semibold'>Moves</p>
+              <p className='text-grey font-semibold' data-testid='moves'>
+                Moves
+              </p>
               <p>{playersUpdatedState.count}</p>
             </div>
           </>
@@ -551,6 +557,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
                       playersUpdatedState.currentPlayer === index + 1,
                   }
                 )}
+                data-testid={`player ${index + 1}`}
               >
                 <p className='player'>{`P ${index + 1}`}</p>
                 <h3 className='score'>
