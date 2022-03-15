@@ -44,6 +44,7 @@ const StartCard = () => {
                     }
                   )}
                   onClick={() => setTheme('number')}
+                  data-testid='numbers'
                 >
                   Numbers
                 </div>
@@ -56,6 +57,7 @@ const StartCard = () => {
                     }
                   )}
                   onClick={() => setTheme('icon')}
+                  data-testid='icons'
                 >
                   Icons
                 </div>
@@ -77,6 +79,7 @@ const StartCard = () => {
                         }
                       )}
                       onClick={() => setNumberOfPlayers(index + 1)}
+                      data-testid={index + 1}
                     >
                       {(index + 1).toString()}
                     </div>
@@ -97,6 +100,7 @@ const StartCard = () => {
                     }
                   )}
                   onClick={() => setGridSize(4)}
+                  data-testid='4x4'
                 >
                   4x4
                 </div>
@@ -109,6 +113,7 @@ const StartCard = () => {
                     }
                   )}
                   onClick={() => setGridSize(6)}
+                  data-testid='6x6'
                 >
                   6x6
                 </div>
@@ -132,6 +137,7 @@ const StartCard = () => {
                     ? () => setStartGame(true)
                     : () => {}
                 }
+                data-testid='start-game'
               >
                 Start Game
               </div>
