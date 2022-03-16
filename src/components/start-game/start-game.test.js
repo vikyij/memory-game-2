@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event'
 import StartCard from './index'
 
 describe('test start game', () => {
-  test('when a numbers theme, one player and 4x4 grid is selected', async () => {
+  test('when a numbers theme, a single player and 4x4 grid is selected', async () => {
     render(<StartCard />)
 
-    const singlePlayer = screen.getByTestId('1')
+    const numbers = screen.getByTestId('numbers')
+    const singlePlayer = screen.getByTestId('player number 1')
     const grid = screen.getByTestId('4x4')
     const startGame = screen.getByTestId('start-game')
-    const numbers = screen.getByTestId('numbers')
 
     userEvent.click(numbers)
     userEvent.click(singlePlayer)
@@ -33,7 +33,7 @@ describe('test start game', () => {
     render(<StartCard />)
 
     const icons = screen.getByTestId('icons')
-    const singlePlayer = screen.getByTestId('1')
+    const singlePlayer = screen.getByTestId('player number 1')
     const grid = screen.getByTestId('4x4')
     const startGame = screen.getByTestId('start-game')
 
@@ -55,7 +55,7 @@ describe('test start game', () => {
     render(<StartCard />)
 
     const numbers = screen.getByTestId('numbers')
-    const multiPlayer = screen.getByTestId('2')
+    const multiPlayer = screen.getByTestId('player number 2')
     const grid = screen.getByTestId('4x4')
     const startGame = screen.getByTestId('start-game')
 
@@ -75,7 +75,7 @@ describe('test start game', () => {
     render(<StartCard />)
 
     const icons = screen.getByTestId('icons')
-    const multiPlayer = screen.getByTestId('2')
+    const multiPlayer = screen.getByTestId('player number 2')
     const grid = screen.getByTestId('4x4')
     const startGame = screen.getByTestId('start-game')
 
@@ -95,7 +95,7 @@ describe('test start game', () => {
     render(<StartCard />)
 
     const numbers = screen.getByTestId('numbers')
-    const multiPlayer = screen.getByTestId('2')
+    const multiPlayer = screen.getByTestId('player number 2')
     const grid = screen.getByTestId('6x6')
     const startGame = screen.getByTestId('start-game')
 

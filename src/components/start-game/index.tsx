@@ -79,7 +79,7 @@ const StartCard = () => {
                         }
                       )}
                       onClick={() => setNumberOfPlayers(index + 1)}
-                      data-testid={index + 1}
+                      data-testid={`player number ${index + 1}`}
                     >
                       {(index + 1).toString()}
                     </div>

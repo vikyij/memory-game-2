@@ -286,456 +286,443 @@ const SelectedGame: React.FC<SelectedProps> = ({
     setGrid(grid)
   }, [gridSize, theme])
 
-  const gridTimeout = useCallback(() => {
-    let initialTimeout: ReturnType<typeof setTimeout>
-    for (
-      let i = 0;
-      i < (theme === 'icon' ? iconsArrSize : randomArraySize);
-      i++
-    ) {
-      initialTimeout = setTimeout(
-        () =>
-          setGrid((grid) => {
-            return {
-              ...grid,
-              [`grid-${i}`]: { ...grid[`grid-${i}`], selected: false },
-            }
-          }),
-        2000
-      )
-    }
-
-    return () => clearTimeout(initialTimeout)
-  }, [randomArraySize, iconsArrSize, theme])
-
-  useEffect(() => {
-    setGridValues()
-  }, [setGridValues])
-
-  useEffect(() => {
-    gridTimeout()
-  }, [gridTimeout])
-
-  const updateTimer = () => {
-    const getSeconds = `0${playersUpdatedState.timer % 60}`.slice(-2)
-    const minutes = `${Math.floor(playersUpdatedState.timer / 60)}`
-    // added + because of a typescript error 'The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type'
-    const getMinutes = `0${+minutes % 60}`.slice(-2)
-    const getHours = `0${Math.floor(playersUpdatedState.timer / 3600)}`.slice(
-      -2
-    )
-    return `${getHours} : ${getMinutes} : ${getSeconds}`
-  }
-
-  const handleClick = (ev: MouseEvent<HTMLDivElement>) => {
-    ev.stopPropagation()
-    let id = (ev.target as HTMLDivElement).getAttribute('data-id')
-
-    playersDispatch({ type: PlayerStateTypes.count })
-
-    if (id) {
-      if (selection.length === 0) {
+const gridTimeout = useCallback(() => {
+  let initialTimeout: ReturnType<typeof setTimeout>
+  for (
+    let i = 0;
+    i < (theme === 'icon' ? iconsArrSize : randomArraySize);
+    i++
+  ) {
+    initialTimeout = setTimeout(
+      () =>
         setGrid((grid) => {
-          const target = grid[id as string]
           return {
             ...grid,
-            [id as string]: { ...target, selected: !target.selected },
+            [`grid-${i}`]: { ...grid[`grid-${i}`], selected: false },
           }
-        })
-        setSelection([id])
-      } else {
-        const target_1 = grid[selection[0]]
-        const target_2 = grid[id]
-
-        if (target_1.value !== target_2.value) {
-          // Set timeout and hide boxes
-          setGrid((grid) => {
-            return {
-              ...grid,
-              [id as string]: { ...target_2, selected: true },
-            }
-          })
-          if (playersUpdatedState.currentPlayer === numberOfPlayers) {
-            //setCurrentPlayer(1)
-            playersDispatch({ type: PlayerStateTypes.resetCurrentPlayer })
-          } else {
-            // setCurrentPlayer((prev) => prev + 1)
-            playersDispatch({ type: PlayerStateTypes.currentPlayer })
-          }
-
-          setTimeout(
-            () =>
-              setGrid((grid) => {
-                return {
-                  ...grid,
-                  [selection[0]]: { ...target_1, selected: false },
-                  [id as string]: { ...target_2, selected: false },
-                }
-              }),
-            500
-          )
-        } else {
-          setGrid((grid) => {
-            return {
-              ...grid,
-              [selection[0]]: { ...target_1, disabled: true, selected: true },
-              [id as string]: { ...target_2, disabled: true, selected: true },
-            }
-          })
-
-          if (playersUpdatedState.currentPlayer === numberOfPlayers) {
-            playersDispatch({ type: PlayerStateTypes.resetCurrentPlayer })
-          } else {
-            playersDispatch({ type: PlayerStateTypes.currentPlayer })
-          }
-
-          dispatch({ type: playersUpdatedState.currentPlayer })
-        }
-        setSelection([])
-      }
-    }
+        }),
+      2000
+    )
   }
 
-  useEffect(() => {
-    const finished = Object.entries(grid).every(
-      ([id, { value, selected, disabled }]) => disabled === true
-    )
+  return () => clearTimeout(initialTimeout)
+}, [randomArraySize, iconsArrSize, theme])
 
-    if (numberOfPlayers === 1) {
-      playersDispatch({
-        type: PlayerStateTypes.singleCompleted,
-        singleCompletedPayload: finished,
-      })
-      const timeInterval = setInterval(() => {
-        if (!finished) {
-          playersDispatch({ type: PlayerStateTypes.timer })
+useEffect(() => {
+  setGridValues()
+}, [setGridValues])
+
+useEffect(() => {
+  gridTimeout()
+}, [gridTimeout])
+
+const updateTimer = () => {
+  const getSeconds = `0${playersUpdatedState.timer % 60}`.slice(-2)
+  const minutes = `${Math.floor(playersUpdatedState.timer / 60)}`
+  // added + because of a typescript error 'The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type'
+  const getMinutes = `0${+minutes % 60}`.slice(-2)
+  const getHours = `0${Math.floor(playersUpdatedState.timer / 3600)}`.slice(-2)
+  return `${getHours} : ${getMinutes} : ${getSeconds}`
+}
+
+const handleClick = (ev: MouseEvent<HTMLDivElement>) => {
+  ev.stopPropagation()
+  let id = (ev.target as HTMLDivElement).getAttribute('data-id')
+
+  playersDispatch({ type: PlayerStateTypes.count })
+
+  if (id) {
+    if (selection.length === 0) {
+      setGrid((grid) => {
+        const target = grid[id as string]
+        return {
+          ...grid,
+          [id as string]: { ...target, selected: !target.selected },
         }
-      }, 1000)
-      return () => {
-        clearInterval(timeInterval)
-      }
-    } else {
-      playersDispatch({
-        type: PlayerStateTypes.multiplayerCompleted,
-        multiCompletedPayload: finished,
       })
+      setSelection([id])
+    } else {
+      const target_1 = grid[selection[0]]
+      const target_2 = grid[id]
+
+      if (target_1.value !== target_2.value) {
+        // Set timeout and hide boxes
+        setGrid((grid) => {
+          return {
+            ...grid,
+            [id as string]: { ...target_2, selected: true },
+          }
+        })
+
+        setTimeout(
+          () =>
+            setGrid((grid) => {
+              return {
+                ...grid,
+                [selection[0]]: { ...target_1, selected: false },
+                [id as string]: { ...target_2, selected: false },
+              }
+            }),
+          500
+        )
+        if (playersUpdatedState.currentPlayer === numberOfPlayers) {
+          playersDispatch({ type: PlayerStateTypes.resetCurrentPlayer })
+        } else {
+          playersDispatch({ type: PlayerStateTypes.currentPlayer })
+        }
+      } else {
+        setGrid((grid) => {
+          return {
+            ...grid,
+            [selection[0]]: { ...target_1, disabled: true, selected: true },
+            [id as string]: { ...target_2, disabled: true, selected: true },
+          }
+        })
+
+        if (playersUpdatedState.currentPlayer === numberOfPlayers) {
+          playersDispatch({ type: PlayerStateTypes.resetCurrentPlayer })
+        } else {
+          playersDispatch({ type: PlayerStateTypes.currentPlayer })
+        }
+
+        dispatch({ type: playersUpdatedState.currentPlayer })
+      }
+      setSelection([])
     }
-  }, [grid, numberOfPlayers])
+  }
+}
 
-  const showWinner = useCallback(() => {
-    let winner: Winner[] = []
-    let playerOne = { player: 1, score: state.player1 }
-    let playerTwo = { player: 2, score: state.player2 }
-    let playerThree = { player: 3, score: state.player3 }
-    let playerFour = { player: 4, score: state.player4 }
-
-    switch (numberOfPlayers) {
-      case 2:
-        winner.push(playerOne, playerTwo)
-        break
-      case 3:
-        winner.push(playerOne, playerTwo, playerThree)
-        break
-      case 4:
-        winner.push(playerOne, playerTwo, playerThree, playerFour)
-        break
-    }
-    winner.sort((a, b) => b.score - a.score)
-    setWinnerScore(winner)
-  }, [numberOfPlayers, state])
-
-  useEffect(
-    () => showWinner(),
-    [showWinner, playersUpdatedState.multiCompleted]
+useEffect(() => {
+  const finished = Object.entries(grid).every(
+    ([id, { value, selected, disabled }]) => disabled === true
   )
 
-  return (
-    <>
-      <div className='Nav'>
-        <h1 className='font-bold text-dark-blue text-2xl mb-10'>memory</h1>
-        {width > 500 ? (
-          <div className='flex justify-center items-center'>
-            <div
-              className='w-32 h-12 bg-orange hover:opacity-70 text-white mr-3.5 rounded-3xl flex justify-center items-center cursor-pointer'
-              onClick={handleRestart}
-            >
-              Restart
-            </div>
-            <div
-              className='w-40 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white mr-3.5 rounded-3xl flex justify-center items-center cursor-pointer'
-              onClick={setNewGame}
-            >
-              New Game
-            </div>
-          </div>
-        ) : (
+  if (numberOfPlayers === 1) {
+    playersDispatch({
+      type: PlayerStateTypes.singleCompleted,
+      singleCompletedPayload: finished,
+    })
+    const timeInterval = setInterval(() => {
+      if (!finished) {
+        playersDispatch({ type: PlayerStateTypes.timer })
+      }
+    }, 1000)
+    return () => {
+      clearInterval(timeInterval)
+    }
+  } else {
+    playersDispatch({
+      type: PlayerStateTypes.multiplayerCompleted,
+      multiCompletedPayload: finished,
+    })
+  }
+}, [grid, numberOfPlayers])
+
+const showWinner = useCallback(() => {
+  let winner: Winner[] = []
+  let playerOne = { player: 1, score: state.player1 }
+  let playerTwo = { player: 2, score: state.player2 }
+  let playerThree = { player: 3, score: state.player3 }
+  let playerFour = { player: 4, score: state.player4 }
+
+  switch (numberOfPlayers) {
+    case 2:
+      winner.push(playerOne, playerTwo)
+      break
+    case 3:
+      winner.push(playerOne, playerTwo, playerThree)
+      break
+    case 4:
+      winner.push(playerOne, playerTwo, playerThree, playerFour)
+      break
+  }
+  winner.sort((a, b) => b.score - a.score)
+  setWinnerScore(winner)
+}, [numberOfPlayers, state])
+
+useEffect(() => showWinner(), [showWinner, playersUpdatedState.multiCompleted])
+
+return (
+  <>
+    <div className='Nav'>
+      <h1 className='font-bold text-dark-blue text-2xl mb-10'>memory</h1>
+      {width > 500 ? (
+        <div className='flex justify-center items-center'>
           <div
-            className='w-20 h-10 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
-            onClick={() =>
-              playersDispatch({
-                type: PlayerStateTypes.showMenuModal,
-                menuModalPayload: true,
-              })
-            }
+            className='w-32 h-12 bg-orange hover:opacity-70 text-white mr-3.5 rounded-3xl flex justify-center items-center cursor-pointer'
+            onClick={handleRestart}
           >
-            Menu
+            Restart
           </div>
-        )}
-      </div>
-
-      <div
-        className='flex justify-between flex-wrap w-80 m-auto mt-5'
-        onClick={handleClick}
-      >
-        {/* convert an object to array */}
-        {Object.entries(grid).map(
-          ([id, { value, icon, selected, disabled }], index) => {
-            return (
-              <div
-                key={id}
-                data-id={id}
-                data-testid={index + 1}
-                className={classnames('circleStyle', {
-                  'pointer-events-none': selected,
-                  'bg-navy-blue': !selected,
-                  'bg-light-grey': selected && disabled,
-                  'bg-orange': selected && !disabled,
-                })}
-                style={{
-                  width: gridSize === 6 ? '46px' : '65px',
-                  height: gridSize === 6 ? '46px' : '65px',
-                  fontSize: gridSize === 6 ? '24px' : '40px',
-                }}
-              >
-                <p
-                  data-id={id}
-                  data-testid = {`grid-value${index + 1}`}
-                  className={classnames('circleValue', {
-                    hidden: !selected,
-                    'p-2': theme === 'icon' && gridSize === 6,
-                    'p-4': theme === 'icon' && gridSize === 4,
-                    'text-2xl': theme === 'icon' && gridSize === 4,
-                  })}
-                >
-                  {theme === 'icon' ? icon : value}
-                </p>
-              </div>
-            )
-          }
-        )}
-      </div>
-
-      <div
-        className='p-6 flex justify-center mt-32'
-        style={{ left: numberOfPlayers === 2 ? '26%' : '0' }}
-      >
-        {numberOfPlayers === 1 ? (
-          <>
-            <div className='updates mr-3'>
-              <p className='text-grey font-semibold' data-testid='time'>
-                Time
-              </p>
-              <p>{updateTimer()}</p>
-            </div>
-            <div className='updates'>
-              <p className='text-grey font-semibold' data-testid='moves'>
-                Moves
-              </p>
-              <p>{playersUpdatedState.count}</p>
-            </div>
-          </>
-        ) : (
-          [...Array(numberOfPlayers)].map((player, index) => {
-            return (
-              <div
-                key={index}
-                className={classnames(
-                  'w-16 md:w-64 h-20 rounded-md flex flex-col md:flex-row justify-center md:justify-around mr-3 items-center',
-                  {
-                    'bg-ash': playersUpdatedState.currentPlayer !== index + 1,
-                    'bg-orange':
-                      playersUpdatedState.currentPlayer === index + 1,
-                  }
-                )}
-                data-testid={`player ${index + 1}`}
-              >
-                <p className='player'>{`P ${index + 1}`}</p>
-                <h3 className='score'>
-                  {index + 1 === 1
-                    ? state.player1
-                    : index + 1 === 2
-                    ? state.player2
-                    : index + 1 === 3
-                    ? state.player3
-                    : index + 1 === 4 && state.player4}
-                </h3>
-              </div>
-            )
-          })
-        )}
-      </div>
-
-      {/* show modal on click of menu button */}
-      {playersUpdatedState.showMenuModal && (
-        <Modal
-          handleClose={() =>
+          <div
+            className='w-40 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white mr-3.5 rounded-3xl flex justify-center items-center cursor-pointer'
+            onClick={setNewGame}
+          >
+            New Game
+          </div>
+        </div>
+      ) : (
+        <div
+          className='w-20 h-10 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
+          onClick={() =>
             playersDispatch({
               type: PlayerStateTypes.showMenuModal,
-              menuModalPayload: false,
+              menuModalPayload: true,
             })
           }
         >
-          <>
+          Menu
+        </div>
+      )}
+    </div>
+
+    <div
+      className='flex justify-between flex-wrap w-80 m-auto mt-5'
+      onClick={handleClick}
+    >
+      {/* convert an object to array */}
+      {Object.entries(grid).map(
+        ([id, { value, icon, selected, disabled }], index) => {
+          return (
             <div
-              className='w-72 h-12 mb-5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
+              key={id}
+              data-id={id}
+              data-testid={index + 1}
+              className={classnames('circleStyle', {
+                'pointer-events-none': selected,
+                'bg-navy-blue': !selected,
+                'bg-light-grey': selected && disabled,
+                'bg-orange': selected && !disabled,
+              })}
+              style={{
+                width: gridSize === 6 ? '46px' : '65px',
+                height: gridSize === 6 ? '46px' : '65px',
+                fontSize: gridSize === 6 ? '24px' : '40px',
+              }}
+            >
+              <p
+                data-id={id}
+                data-testid={`grid-value${index + 1}`}
+                className={classnames('circleValue', {
+                  hidden: !selected,
+                  'p-2': theme === 'icon' && gridSize === 6,
+                  'p-4': theme === 'icon' && gridSize === 4,
+                  'text-2xl': theme === 'icon' && gridSize === 4,
+                })}
+              >
+                {theme === 'icon' ? icon : value}
+              </p>
+            </div>
+          )
+        }
+      )}
+    </div>
+
+    <div
+      className='p-6 flex justify-center mt-32'
+      style={{ left: numberOfPlayers === 2 ? '26%' : '0' }}
+    >
+      {numberOfPlayers === 1 ? (
+        <>
+          <div className='updates mr-3'>
+            <p className='text-grey font-semibold' data-testid='time'>
+              Time
+            </p>
+            <p>{updateTimer()}</p>
+          </div>
+          <div className='updates'>
+            <p className='text-grey font-semibold' data-testid='moves'>
+              Moves
+            </p>
+            <p>{playersUpdatedState.count}</p>
+          </div>
+        </>
+      ) : (
+        [...Array(numberOfPlayers)].map((player, index) => {
+          return (
+            <div
+              key={index}
+              className={classnames(
+                'w-16 md:w-64 h-20 rounded-md flex flex-col md:flex-row justify-center md:justify-around mr-3 items-center',
+                {
+                  'bg-ash': playersUpdatedState.currentPlayer !== index + 1,
+                  'bg-orange': playersUpdatedState.currentPlayer === index + 1,
+                }
+              )}
+              data-testid={`player ${index + 1}`}
+            >
+              <p className='player'>{`P ${index + 1}`}</p>
+              <h3 className='score'>
+                {index + 1 === 1
+                  ? state.player1
+                  : index + 1 === 2
+                  ? state.player2
+                  : index + 1 === 3
+                  ? state.player3
+                  : index + 1 === 4 && state.player4}
+              </h3>
+            </div>
+          )
+        })
+      )}
+    </div>
+
+    {/* show modal on click of menu button */}
+    {playersUpdatedState.showMenuModal && (
+      <Modal
+        handleClose={() =>
+          playersDispatch({
+            type: PlayerStateTypes.showMenuModal,
+            menuModalPayload: false,
+          })
+        }
+      >
+        <>
+          <div
+            className='w-72 h-12 mb-5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
+            onClick={handleRestart}
+          >
+            Restart
+          </div>
+          <div
+            className='w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer'
+            onClick={setNewGame}
+          >
+            New Game
+          </div>
+        </>
+      </Modal>
+    )}
+
+    {/* show modal when game is completed for a single player */}
+    {playersUpdatedState.singleCompleted && (
+      <Modal width={width > 500 ? '654px' : '327px'} height='376px'>
+        <>
+          <h1 className='modal2-heading'>You did it!</h1>
+          <p className='modal2-subheading'>Game over! Here’s how you got on…</p>
+          <div style={{ margin: '25px auto' }}>
+            <div
+              className='modal-timer-div w-64 md:w-96 h-12 bg-ash'
+              style={{ marginBottom: '10px' }}
+            >
+              <p className='modal-timer-text text-grey'>Time Elapsed</p>
+              <p className='modal-timer-text2 text-navy-blue'>
+                {updateTimer()}
+              </p>
+            </div>
+            <div className='modal-timer-div w-64 md:w-96 h-12 bg-ash'>
+              <p className='modal-timer-text text-grey'>Moves Taken</p>
+              <p className='modal-timer-text2 text-navy-blue'>{`${playersUpdatedState.count} Moves`}</p>
+            </div>
+          </div>
+          <div className='md:flex'>
+            <div
+              className={classnames(
+                'w-72 h-12 mb-5 mr-2.5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer',
+                {
+                  'w-48': width > 500,
+                  'w-72': width < 500,
+                }
+              )}
               onClick={handleRestart}
             >
               Restart
             </div>
             <div
-              className='w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer'
+              className={classnames(
+                'w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
+                {
+                  'w-48': width > 500,
+                  'w-72': width < 500,
+                }
+              )}
               onClick={setNewGame}
             >
               New Game
             </div>
-          </>
-        </Modal>
-      )}
+          </div>
+        </>
+      </Modal>
+    )}
 
-      {/* show modal when game is completed for a single player */}
-      {playersUpdatedState.singleCompleted && (
-        <Modal width={width > 500 ? '654px' : '327px'} height='376px'>
-          <>
-            <h1 className='modal2-heading'>You did it!</h1>
-            <p className='modal2-subheading'>
-              Game over! Here’s how you got on…
-            </p>
-            <div style={{ margin: '25px auto' }}>
-              <div
-                className='modal-timer-div w-64 md:w-96 h-12 bg-ash'
-                style={{ marginBottom: '10px' }}
-              >
-                <p className='modal-timer-text text-grey'>Time Elapsed</p>
-                <p className='modal-timer-text2 text-navy-blue'>
-                  {updateTimer()}
-                </p>
-              </div>
-              <div className='modal-timer-div w-64 md:w-96 h-12 bg-ash'>
-                <p className='modal-timer-text text-grey'>Moves Taken</p>
-                <p className='modal-timer-text2 text-navy-blue'>{`${playersUpdatedState.count} Moves`}</p>
-              </div>
-            </div>
-            <div className='md:flex'>
-              <div
-                className={classnames(
-                  'w-72 h-12 mb-5 mr-2.5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer',
-                  {
-                    'w-48': width > 500,
-                    'w-72': width < 500,
-                  }
-                )}
-                onClick={handleRestart}
-              >
-                Restart
-              </div>
-              <div
-                className={classnames(
-                  'w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
-                  {
-                    'w-48': width > 500,
-                    'w-72': width < 500,
-                  }
-                )}
-                onClick={setNewGame}
-              >
-                New Game
-              </div>
-            </div>
-          </>
-        </Modal>
-      )}
-
-      {/* show modal when game is completed for multiplayer */}
-      {playersUpdatedState.multiCompleted && (
-        <Modal width={width > 500 ? '654px' : '327px'} height='488px'>
-          <>
-            <h1 className='modal2-heading'>
-              {winnerScore[0].score === winnerScore[1].score
-                ? 'It’s a tie!'
-                : `Player ${winnerScore[0].player} Wins!`}
-            </h1>
-            <p className='modal2-subheading'>
-              Game over! Here are the results…
-            </p>
-            <div style={{ margin: '25px auto' }}>
-              {winnerScore.map((player, index) => {
-                return (
-                  <div
-                    key={index}
+    {/* show modal when game is completed for multiplayer */}
+    {playersUpdatedState.multiCompleted && (
+      <Modal width={width > 500 ? '654px' : '327px'} height='488px'>
+        <>
+          <h1 className='modal2-heading'>
+            {winnerScore[0].score === winnerScore[1].score
+              ? 'It’s a tie!'
+              : `Player ${winnerScore[0].player} Wins!`}
+          </h1>
+          <p className='modal2-subheading'>Game over! Here are the results…</p>
+          <div style={{ margin: '25px auto' }}>
+            {winnerScore.map((player, index) => {
+              return (
+                <div
+                  key={index}
+                  className={classnames(
+                    'modal-timer-div',
+                    'bg-ash',
+                    'text-grey',
+                    'w-72',
+                    'md:w-96',
+                    {
+                      'text-white':
+                        index === 0 || player.score === winnerScore[0].score,
+                      'bg-dark-blue':
+                        index === 0 || player.score === winnerScore[0].score,
+                    }
+                  )}
+                  style={{ marginBottom: '10px' }}
+                >
+                  <p className='modal-timer-text'>Player {player.player}</p>
+                  <p
                     className={classnames(
-                      'modal-timer-div',
-                      'bg-ash',
-                      'text-grey',
-                      'w-72',
-                      'md:w-96',
+                      'modal-timer-text2',
+                      'text-dark-blue',
                       {
                         'text-white':
                           index === 0 || player.score === winnerScore[0].score,
-                        'bg-dark-blue':
-                          index === 0 || player.score === winnerScore[0].score,
                       }
                     )}
-                    style={{ marginBottom: '10px' }}
                   >
-                    <p className='modal-timer-text'>Player {player.player}</p>
-                    <p
-                      className={classnames(
-                        'modal-timer-text2',
-                        'text-dark-blue',
-                        {
-                          'text-white':
-                            index === 0 ||
-                            player.score === winnerScore[0].score,
-                        }
-                      )}
-                    >
-                      {player.score}Pairs
-                    </p>
-                  </div>
-                )
-              })}
+                    {player.score}Pairs
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+          <div className='md:flex'>
+            <div
+              className={classnames(
+                'w-72 h-12 mb-5 mr-2.5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer',
+                {
+                  'w-48': width > 500,
+                  'w-72': width < 500,
+                }
+              )}
+              onClick={handleRestart}
+            >
+              Restart
             </div>
-            <div className='md:flex'>
-              <div
-                className={classnames(
-                  'w-72 h-12 mb-5 mr-2.5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer',
-                  {
-                    'w-48': width > 500,
-                    'w-72': width < 500,
-                  }
-                )}
-                onClick={handleRestart}
-              >
-                Restart
-              </div>
-              <div
-                className={classnames(
-                  'w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
-                  {
-                    'w-48': width > 500,
-                    'w-72': width < 500,
-                  }
-                )}
-                onClick={setNewGame}
-              >
-                New Game
-              </div>
+            <div
+              className={classnames(
+                'w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
+                {
+                  'w-48': width > 500,
+                  'w-72': width < 500,
+                }
+              )}
+              onClick={setNewGame}
+            >
+              New Game
             </div>
-          </>
-        </Modal>
-      )}
-    </>
-  )
+          </div>
+        </>
+      </Modal>
+    )}
+  </>
+)
 }
 
 export default SelectedGame
