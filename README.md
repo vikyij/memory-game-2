@@ -37,6 +37,12 @@ Users should be able to:
 - Choose to play on either a 6x6 or 4x4 grid
 
 ### Screenshot
+<img width="1280" alt="Screenshot 2022-03-16 at 22 04 01" src="https://user-images.githubusercontent.com/24552711/158691094-ddef05c3-fe60-4254-bf29-6eb070161c38.png">
+<img width="1280" alt="Screenshot 2022-03-16 at 22 04 09" src="https://user-images.githubusercontent.com/24552711/158691177-544e3ab1-8ead-4877-81ab-7281af361835.png">
+<img width="1280" alt="Screenshot 2022-03-16 at 22 04 52" src="https://user-images.githubusercontent.com/24552711/158691201-f8cd15ff-c0d2-4489-a073-2be623638e9e.png">
+<img width="1280" alt="Screenshot 2022-03-16 at 22 05 00" src="https://user-images.githubusercontent.com/24552711/158691246-52588f33-b603-474b-a7ab-f9e904608da1.png">
+<img width="1280" alt="Screenshot 2022-03-16 at 22 06 58" src="https://user-images.githubusercontent.com/24552711/158691308-94421a03-f95d-4861-9a2a-2320a475fc8d.png">
+<img width="1280" alt="Screenshot 2022-03-16 at 22 07 10" src="https://user-images.githubusercontent.com/24552711/158691342-ec8fd87a-13af-441f-9ba0-fa9a0d79b914.png">
 
 
 
