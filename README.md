@@ -49,7 +49,7 @@ Users should be able to:
 ### Links
 
 - Solution URL: (https://github.com/vikyij/memory-game-2)
-- Live Site URL: (https://your-live-site-url.com)
+- Live Site URL: (https://memory-game-e9uz3hu60-vikyij.vercel.app/)
 
 ## My process
 
