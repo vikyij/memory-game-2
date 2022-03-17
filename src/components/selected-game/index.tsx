@@ -329,8 +329,7 @@ const handleClick = (ev: MouseEvent<HTMLDivElement>) => {
   ev.stopPropagation()
   let id = (ev.target as HTMLDivElement).getAttribute('data-id')
 
-  //increase the move for single player
-  playersDispatch({ type: PlayerStateTypes.count })
+ 
 
   if (id) {
     if (selection.length === 0) {
@@ -366,6 +365,10 @@ const handleClick = (ev: MouseEvent<HTMLDivElement>) => {
             }),
           500
         )
+
+        //increase the move for single player
+        playersDispatch({ type: PlayerStateTypes.count })
+
         if (playersUpdatedState.currentPlayer === numberOfPlayers) {
           playersDispatch({ type: PlayerStateTypes.resetCurrentPlayer })
         } else {
@@ -379,6 +382,9 @@ const handleClick = (ev: MouseEvent<HTMLDivElement>) => {
             [id as string]: { ...target_2, disabled: true, selected: true },
           }
         })
+
+        //increase the move for single player
+        playersDispatch({ type: PlayerStateTypes.count })
 
         // update current player
         if (playersUpdatedState.currentPlayer === numberOfPlayers) {
