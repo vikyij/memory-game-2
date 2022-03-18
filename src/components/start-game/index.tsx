@@ -33,7 +33,7 @@ const StartCard = () => {
 
           <div className='card-container w-80 lg:w-3/6 h-96 lg:h-2/3 py-2.5 lg:py-5 px-0'>
             <div className='section-container'>
-              <h3 className='sub-heading'>Select Theme</h3>
+              <h2 className='sub-heading'>Select Theme</h2>
               <div className='flex'>
                 <div
                   className={classNames(
@@ -65,7 +65,7 @@ const StartCard = () => {
             </div>
 
             <div className='section-container'>
-              <h3 className='sub-heading'>Numbers of Players</h3>
+              <h2 className='sub-heading'>Numbers of Players</h2>
               <div className='flex'>
                 {[...Array(4)].map((item, index) => {
                   return (
@@ -89,7 +89,7 @@ const StartCard = () => {
             </div>
 
             <div className='section-container'>
-              <h3 className='sub-heading'>Grid Size</h3>
+              <h2 className='sub-heading'>Grid Size</h2>
               <div className='flex'>
                 <div
                   className={classNames(
