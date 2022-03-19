@@ -13,6 +13,7 @@ import SinglePlayer from '../SinglePlayer'
 import MultiPlayer from '../MultiPlayer'
 import SinglePlayerModalContent from '../SinglePlayer/SinglePlayerModalContent'
 import MultiPlayerModalContent from '../MultiPlayer/MultiPlayerModalContent'
+import CtaButtons from '../CTAButtons'
 import { icons } from './icons'
 import { shuffleArray } from '../utils'
 
@@ -423,22 +424,22 @@ const SelectedGame: React.FC<SelectedProps> = ({
         <h1 className='font-bold text-dark-blue text-2xl mb-10'>memory</h1>
         {width > 500 ? (
           <div className='flex justify-center items-center'>
-            <div
-              className='w-32 h-12 bg-orange hover:opacity-70 text-white mr-3.5 rounded-3xl flex justify-center items-center cursor-pointer'
+            <button
+              className='w-32 h-12 bg-orange hover:opacity-70 text-white mr-3.5 rounded-3xl flex justify-center items-center'
               onClick={handleRestart}
             >
               Restart
-            </div>
-            <div
-              className='w-40 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white mr-3.5 rounded-3xl flex justify-center items-center cursor-pointer'
+            </button>
+            <button
+              className='w-40 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white mr-3.5 rounded-3xl flex justify-center items-center'
               onClick={setNewGame}
             >
               New Game
-            </div>
+            </button>
           </div>
         ) : (
-          <div
-            className='w-20 h-10 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
+          <button
+            className='w-20 h-10 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center'
             onClick={() =>
               playersDispatch({
                 type: PlayerStateTypes.showMenuModal,
@@ -447,7 +448,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
             }
           >
             Menu
-          </div>
+          </button>
         )}
       </div>
 
@@ -475,10 +476,10 @@ const SelectedGame: React.FC<SelectedProps> = ({
                   fontSize: gridSize === 6 ? '24px' : '40px',
                 }}
               >
-                <p
+                <button
                   data-id={id}
                   data-testid={`grid-value${index + 1}`}
-                  className={classnames('circleValue', {
+                  className={classnames({
                     hidden: !selected,
                     'p-2': theme === 'icon' && gridSize === 6,
                     'p-4': theme === 'icon' && gridSize === 4,
@@ -486,7 +487,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
                   })}
                 >
                   {theme === 'icon' ? icon : value}
-                </p>
+                </button>
               </div>
             )
           }
@@ -521,20 +522,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
             })
           }
         >
-          <>
-            <div
-              className='w-72 h-12 mb-5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer'
-              onClick={handleRestart}
-            >
-              Restart
-            </div>
-            <div
-              className='w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer'
-              onClick={setNewGame}
-            >
-              New Game
-            </div>
-          </>
+          <CtaButtons handleRestart={handleRestart} setNewGame={setNewGame} />
         </Modal>
       )}
 

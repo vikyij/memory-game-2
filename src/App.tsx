@@ -1,8 +1,7 @@
-import React from 'react'
-import Home from './pages/home'
+import StartCard from './pages/start-game'
 
 const GameApp = () => {
-  return <Home />
+  return <StartCard />
 }
 
 export default GameApp
