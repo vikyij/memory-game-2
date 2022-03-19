@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import classnames from 'classnames'
 import { updateTimer } from '../utils'
+import CtaButtons from '../CTAButtons'
 
 interface SinglePlayerModalContentProps {
   time: number
@@ -15,8 +14,6 @@ const SinglePlayerModalContent: React.FC<SinglePlayerModalContentProps> = ({
   handleRestart,
   setNewGame,
 }) => {
-  const [width] = useState(window.innerWidth)
-
   return (
     <>
       <h1 className='modal2-heading'>You did it!</h1>
@@ -36,32 +33,7 @@ const SinglePlayerModalContent: React.FC<SinglePlayerModalContentProps> = ({
           <p className='modal-timer-text2 text-navy-blue'>{`${count} Moves`}</p>
         </div>
       </div>
-      <div className='md:flex'>
-        <div
-          className={classnames(
-            'w-72 h-12 mb-5 mr-2.5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer',
-            {
-              'w-48': width > 500,
-              'w-72': width < 500,
-            }
-          )}
-          onClick={handleRestart}
-        >
-          Restart
-        </div>
-        <div
-          className={classnames(
-            'w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
-            {
-              'w-48': width > 500,
-              'w-72': width < 500,
-            }
-          )}
-          onClick={setNewGame}
-        >
-          New Game
-        </div>
-      </div>
+      <CtaButtons handleRestart={handleRestart} setNewGame={setNewGame} />
     </>
   )
 }

@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import classnames from 'classnames'
+import CtaButtons from '../CTAButtons'
 
 interface MultiPlayerModalContentProps {
   winnerScore: { player: number; score: number }[]
@@ -12,8 +12,6 @@ const MultiPlayerModalContent: React.FC<MultiPlayerModalContentProps> = ({
   handleRestart,
   setNewGame,
 }) => {
-  const [width] = useState(window.innerWidth)
-
   return (
     <>
       <h1 className='modal2-heading'>
@@ -56,32 +54,7 @@ const MultiPlayerModalContent: React.FC<MultiPlayerModalContentProps> = ({
           )
         })}
       </div>
-      <div className='md:flex'>
-        <div
-          className={classnames(
-            'w-72 h-12 mb-5 mr-2.5 bg-orange hover:opacity-70 text-white rounded-3xl flex justify-center items-center cursor-pointer',
-            {
-              'w-48': width > 500,
-              'w-72': width < 500,
-            }
-          )}
-          onClick={handleRestart}
-        >
-          Restart
-        </div>
-        <div
-          className={classnames(
-            'w-72 h-12 bg-ash hover:bg-light-blue text-navy-blue hover:text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
-            {
-              'w-48': width > 500,
-              'w-72': width < 500,
-            }
-          )}
-          onClick={setNewGame}
-        >
-          New Game
-        </div>
-      </div>
+      <CtaButtons handleRestart={handleRestart} setNewGame={setNewGame} />
     </>
   )
 }

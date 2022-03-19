@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import classNames from 'classnames'
-import Game from '../../components/selected-game'
+import SelectedGame from '../../components/selected-game'
 
 import './start-game.css'
 
 const StartCard = () => {
- 
   const [gridSize, setGridSize] = useState(0)
   const [numberOfPlayers, setNumberOfPlayers] = useState(0)
   const [startGame, setStartGame] = useState(false)
@@ -21,7 +20,7 @@ const StartCard = () => {
   return (
     <>
       {startGame ? (
-        <Game
+        <SelectedGame
           gridSize={gridSize}
           numberOfPlayers={numberOfPlayers}
           handleEndGame={handleEndGame}
@@ -35,9 +34,9 @@ const StartCard = () => {
             <div className='section-container'>
               <h2 className='sub-heading'>Select Theme</h2>
               <div className='flex'>
-                <div
+                <button
                   className={classNames(
-                    'w-32 lg:w-64 h-10 lg:h-12  hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer',
+                    'w-32 lg:w-64 h-10 lg:h-12  hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center',
                     {
                       'bg-light-grey': theme !== 'number',
                       'bg-navy-blue': theme === 'number',
@@ -47,10 +46,10 @@ const StartCard = () => {
                   data-testid='numbers'
                 >
                   Numbers
-                </div>
-                <div
+                </button>
+                <button
                   className={classNames(
-                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue  active:bg-navy-blue text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
+                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue  active:bg-navy-blue text-off-white rounded-3xl flex justify-center items-center',
                     {
                       'bg-light-grey': theme !== 'icon',
                       'bg-navy-blue': theme === 'icon',
@@ -60,7 +59,7 @@ const StartCard = () => {
                   data-testid='icons'
                 >
                   Icons
-                </div>
+                </button>
               </div>
             </div>
 
@@ -69,10 +68,10 @@ const StartCard = () => {
               <div className='flex'>
                 {[...Array(4)].map((item, index) => {
                   return (
-                    <div
+                    <button
                       key={index}
                       className={classNames(
-                        'w-14 lg:w-32 h-10 lg:h-12 hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer',
+                        'w-14 lg:w-32 h-10 lg:h-12 hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center',
                         {
                           'bg-light-grey': numberOfPlayers !== index + 1,
                           'bg-navy-blue': numberOfPlayers === index + 1,
@@ -82,7 +81,7 @@ const StartCard = () => {
                       data-testid={`player number ${index + 1}`}
                     >
                       {(index + 1).toString()}
-                    </div>
+                    </button>
                   )
                 })}
               </div>
@@ -91,9 +90,9 @@ const StartCard = () => {
             <div className='section-container'>
               <h2 className='sub-heading'>Grid Size</h2>
               <div className='flex'>
-                <div
+                <button
                   className={classNames(
-                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center cursor-pointer',
+                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue text-off-white mr-2.5 rounded-3xl flex justify-center items-center',
                     {
                       'bg-light-grey': gridSize !== 4,
                       'bg-navy-blue': gridSize === 4,
@@ -103,10 +102,10 @@ const StartCard = () => {
                   data-testid='4x4'
                 >
                   4x4
-                </div>
-                <div
+                </button>
+                <button
                   className={classNames(
-                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue text-off-white rounded-3xl flex justify-center items-center cursor-pointer',
+                    'w-32 lg:w-64 h-10 lg:h-12 hover:bg-light-blue text-off-white rounded-3xl flex justify-center items-center',
                     {
                       'bg-light-grey': gridSize !== 6,
                       'bg-navy-blue': gridSize === 6,
@@ -116,7 +115,7 @@ const StartCard = () => {
                   data-testid='6x6'
                 >
                   6x6
-                </div>
+                </button>
               </div>
             </div>
 
@@ -124,12 +123,12 @@ const StartCard = () => {
               style={{ marginTop: '20px' }}
               className='flex justify-center w-full'
             >
-              <div
+              <button
                 className={classNames(
                   'w-72 lg:w-4/5 h-10 lg:h-12 bg-orange text-off-white rounded-3xl flex justify-center items-center hover:opacity-70',
                   {
-                    'cursor-pointer':
-                      gridSize !== 0 && numberOfPlayers !== 0 && theme !== '',
+                    'pointer-events-none':
+                      gridSize === 0 || numberOfPlayers === 0 || theme === '',
                   }
                 )}
                 onClick={
@@ -140,7 +139,7 @@ const StartCard = () => {
                 data-testid='start-game'
               >
                 Start Game
-              </div>
+              </button>
             </div>
           </div>
         </div>
