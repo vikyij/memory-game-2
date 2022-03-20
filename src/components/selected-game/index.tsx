@@ -464,12 +464,15 @@ const SelectedGame: React.FC<SelectedProps> = ({
                 key={id}
                 data-id={id}
                 data-testid={index + 1}
-                className={classnames('circleStyle', {
-                  'pointer-events-none': selected,
-                  'bg-navy-blue': !selected,
-                  'bg-light-grey': selected && disabled,
-                  'bg-orange': selected && !disabled,
-                })}
+                className={classnames(
+                  'circleStyle transition ease-in delay-150 transform hover:translate-x-1',
+                  {
+                    'pointer-events-none': selected,
+                    'bg-navy-blue': !selected,
+                    'bg-light-grey': selected && disabled,
+                    'bg-orange': selected && !disabled,
+                  }
+                )}
                 style={{
                   width: gridSize === 6 ? '46px' : '65px',
                   height: gridSize === 6 ? '46px' : '65px',
@@ -495,7 +498,7 @@ const SelectedGame: React.FC<SelectedProps> = ({
       </div>
 
       <div
-        className='p-6 flex justify-center mt-32'
+        className='p-6 flex justify-center mt-20'
         style={{ left: numberOfPlayers === 2 ? '26%' : '0' }}
       >
         {numberOfPlayers === 1 ? (
